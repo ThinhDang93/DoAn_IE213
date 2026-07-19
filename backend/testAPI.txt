@@ -1,0 +1,27 @@
+POST /api/QuanLyNguoiDung/DangKy
+
+Input Body: {"taiKhoan": "khachhang01", "matKhau": "123456", "hoTen": "Nguyen Van A", "email": "a@gmail.com", "soDT": "0909123456"}
+Output:
+JSON
+{
+  "statusCode": 201,
+  "message": "Đăng ký tài khoản thành công.",
+  "content": null
+}
+
+
+POST /api/QuanLyNguoiDung/DangNhap
+Input Body: {"taiKhoan": "khachhang01", "matKhau": "123456"}
+Output:
+{
+  "statusCode": 200,
+  "message": "Đăng nhập thành công.",
+  "content": {
+    "taiKhoan": "khachhang01",
+    "hoTen": "Nguyen Van A",
+    "email": "a@gmail.com",
+    "soDT": "0909123456",
+    "maLoaiNguoiDung": "KhachHang",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR..."
+  }
+}
