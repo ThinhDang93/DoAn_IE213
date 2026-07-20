@@ -45,7 +45,7 @@ export const capNhatThongTinTaiKhoan = async (req, res) => {
     }
 };
 
-// [GET] Admin: DanhSachNguoiDung
+// [GET] Admin: /api/QuanLyNguoiDung/DanhSachNguoiDung
 export const layDanhSachNguoiDung = async (req, res) => {
     try {
         // Truy vấn toàn bộ dữ liệu, loại bỏ trường matKhau để bảo mật
