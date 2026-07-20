@@ -1,8 +1,10 @@
-import dns from "dns";
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+// import dns from "dns";
+// dns.setServers(["1.1.1.1", "8.8.8.8"]);
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/users.routes.js';
+
 
 const app = express();
 
@@ -12,6 +14,7 @@ app.use(express.json());
 
 // Tích hợp hệ thống định tuyến
 app.use('/api/QuanLyNguoiDung', authRoutes);
+app.use('/api/QuanLyNguoiDung', userRoutes)
 
 // Trình xử lý định tuyến dự phòng cho các endpoint không tồn tại (Lỗi 404)
 app.use((req, res) => {
