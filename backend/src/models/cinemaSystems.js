@@ -1,0 +1,21 @@
+import mongoose from "mongoose";
+
+const cinemaSystemSchema = new mongoose.Schema(
+    {
+        tenHeThongRap: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        logo: {
+            type: String,
+            required: true,
+        },
+    },
+    {
+        timestamps: true,
+        versionKey: false,
+    }
+);
+
+export default mongoose.model("CinemaSystem", cinemaSystemSchema);
