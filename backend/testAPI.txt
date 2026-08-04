@@ -1,0 +1,6 @@
+GET localhost:8080/api/QuanLyPhim/LayDanhSachPhim
+
+GET localhost:8080/api/QuanLyPhim/LayThongTinPhim?MaPhim=6a7211ec431bf6666fb5669c
+
+GET localhost:8080/api/QuanLyPhim/LayDanhSachBanner
+
