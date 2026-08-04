@@ -1,0 +1,89 @@
+POST localhost:8080/api/QuanLyNguoiDung/DangKy
+
+Input Body: 
+{
+  "taiKhoan": "khachhang01", 
+  "matKhau": "123456", 
+  "hoTen": "Nguyen Van A", 
+  "email": "a@gmail.com", 
+  "soDT": "0909123456"
+}
+Output:
+JSON
+{
+  "statusCode": 201,
+  "message": "Đăng ký tài khoản thành công.",
+  "content": null
+}
+
+
+================================================================
+POST localhost:8080/api/QuanLyNguoiDung/DangNhap
+Input Body: 
+{
+  "taiKhoan": "khachhang01",
+  "matKhau": "123456"
+}
+Output:
+{
+  "statusCode": 200,
+  "message": "Đăng nhập thành công.",
+  "content": {
+    "taiKhoan": "khachhang01",
+    "hoTen": "Nguyen Van A",
+    "email": "a@gmail.com",
+    "soDT": "0909123456",
+    "maLoaiNguoiDung": "KhachHang",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR..."
+  }
+}
+Tests của Request Script
+const response = tc.response.json;
+if(response.statusCode === 200 && response.content.accessToken) {
+    if(response.content.maLoaiNguoiDung === 'QuanTri') {
+        tc.setEnv("adminToken", response.content.accessToken);
+    } else {
+        tc.setEnv("userToken", response.content.accessToken);
+    }
+}
+
+
+================================================================
+GET localhost:8080/api/QuanLyNguoiDung/ThongTinTaiKhoan
+
+================================================================
+PUT GET localhost:8080/api/QuanLyNguoiDung/ThongTinTaiKhoan
+Input: + auth Bearer token (accessToken)
+{
+  "hoTen": "Nguyen Van A Updated",
+  "email": "a_updated@gmail.com",
+  "soDT": "0909999999"
+}
+
+
+
+================================================================
+Tạo acc admin
+POST localhost:8080/api/QuanLyNguoiDung/DangKy
+chuyển KhachHang -> QuanTri
+{
+  "taiKhoan": "admin", 
+  "matKhau": "123456", 
+  "hoTen": "Nguyen", 
+  "email": "adm@gmail.com", 
+  "soDT": "0909123456"
+}
+-> admin accessToken
+
+Lấy danh sách người dùng
+GET localhost:8080/api/QuanLyNguoiDung/DanhSachNguoiDung
+
+Cập nhật người dùng
+PUT localhost:8080/api/QuanLyNguoiDung/CapNhatNguoiDung?TaiKhoan=khachhang01
+{
+  "hoTen": "AAA",
+  "maLoaiNguoiDung": "KhachHang"
+}
+
+Xóa người dùng
+DELETE localhost:8080/api/QuanLyNguoiDung/XoaNguoiDung?TaiKhoan=khachhang01
