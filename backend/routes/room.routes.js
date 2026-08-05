@@ -8,9 +8,11 @@ import {
     ThemRap,
     XoaRap,
 } from "../controllers/roomsController.js";
+import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
+router.use(verifyToken, checkAdmin);
 router.get("/LayDanhSachRap", LayDanhSachRap);
 
 router.get("/LayThongTinRap", LayThongTinRap);

@@ -7,8 +7,10 @@ import {
     ThemLichChieu,
     XoaLichChieu,
 } from "../controllers/showtimesController.js";
+import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
+router.use(verifyToken, checkAdmin);
 
 router.get("/LayDanhSachLichChieu", LayDanhSachLichChieu);
 
