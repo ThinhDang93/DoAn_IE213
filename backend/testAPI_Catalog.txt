@@ -1,6 +1,163 @@
+================ CATALOG API TEST =================
+
+Luu y chung:
+- Thay cac ID mau bang ID that trong database.
+- Cac API upload phim dung Body = Form-Data, field file phai la "File".
+
+
+================ 1) QUAN LY PHIM =================
+
 GET localhost:8080/api/QuanLyPhim/LayDanhSachPhim
 
-GET localhost:8080/api/QuanLyPhim/LayThongTinPhim?MaPhim=6a7211ec431bf6666fb5669c
+GET localhost:8080/api/QuanLyPhim/LayThongTinPhim?MaPhim=<MOVIE_ID>
 
 GET localhost:8080/api/QuanLyPhim/LayDanhSachBanner
+
+POST localhost:8080/api/QuanLyPhim/ThemPhimUploadHinh
+Body: Form-Data
+- tenPhim: Dune: Part Two
+- trailer: https://www.youtube.com/watch?v=Way9Dexny3w
+- moTa: Phim khoa hoc vien tuong moi
+- ngayKhoiChieu: 2026-11-01
+- dangChieu: true
+- sapChieu: false
+- hot: true
+- danhGia: 9
+- File: <chon file anh>
+
+POST localhost:8080/api/QuanLyPhim/CapNhatPhimUpload
+Body: Form-Data
+- maPhim: <MOVIE_ID>
+- tenPhim: Dune: Part Two Updated
+- trailer: https://www.youtube.com/watch?v=Way9Dexny3w
+- moTa: Cap nhat mo ta
+- ngayKhoiChieu: 2026-11-05
+- dangChieu: true
+- sapChieu: false
+- hot: true
+- danhGia: 10
+- File: <chon file anh moi> (optional)
+
+PUT localhost:8080/api/QuanLyPhim/CapNhatPhimUpload
+Body: Form-Data (giong POST ben tren)
+
+DELETE localhost:8080/api/QuanLyPhim/XoaPhim?MaPhim=<MOVIE_ID>
+
+
+================ 2) QUAN LY HE THONG RAP =================
+
+GET localhost:8080/api/QuanLyHeThongRap/LayThongTinHeThongRap
+
+GET localhost:8080/api/QuanLyHeThongRap/LayThongTinHeThongRap?MaHeThongRap=<HE_THONG_RAP_ID>
+
+POST localhost:8080/api/QuanLyHeThongRap/ThemHeThongRap
+Body: JSON
+{
+	"tenHeThongRap": "Galaxy Cinema",
+	"logo": "https://placehold.co/120x120/png?text=Galaxy"
+}
+
+PUT localhost:8080/api/QuanLyHeThongRap/CapNhatHeThongRap
+Body: JSON
+{
+	"maHeThongRap": "<HE_THONG_RAP_ID>",
+	"tenHeThongRap": "Galaxy Cinema Updated",
+	"logo": "https://placehold.co/120x120/png?text=Galaxy+New"
+}
+
+DELETE localhost:8080/api/QuanLyHeThongRap/XoaHeThongRap?MaHeThongRap=<HE_THONG_RAP_ID>
+
+
+================ 3) QUAN LY CUM RAP =================
+
+GET localhost:8080/api/QuanLyCumRap/LayDanhSachCumRap
+
+GET localhost:8080/api/QuanLyCumRap/LayDanhSachCumRap?MaHeThongRap=<HE_THONG_RAP_ID>
+
+GET localhost:8080/api/QuanLyCumRap/LayThongTinCumRap?MaCumRap=<CUM_RAP_ID>
+
+POST localhost:8080/api/QuanLyCumRap/ThemCumRap
+Body: JSON
+{
+	"tenCumRap": "CGV Landmark",
+	"diaChi": "720A Dien Bien Phu, Binh Thanh, TP.HCM",
+	"hinhAnh": "https://placehold.co/400x240/png?text=CGV+Landmark",
+	"maHeThongRap": "<HE_THONG_RAP_ID>"
+}
+
+PUT localhost:8080/api/QuanLyCumRap/CapNhatCumRap
+Body: JSON
+{
+	"maCumRap": "<CUM_RAP_ID>",
+	"tenCumRap": "CGV Landmark Updated",
+	"diaChi": "Dia chi moi",
+	"hinhAnh": "https://placehold.co/400x240/png?text=CGV+Landmark+New",
+	"maHeThongRap": "<HE_THONG_RAP_ID>"
+}
+
+DELETE localhost:8080/api/QuanLyCumRap/XoaCumRap?MaCumRap=<CUM_RAP_ID>
+
+
+================ 4) QUAN LY RAP =================
+
+GET localhost:8080/api/QuanLyRap/LayDanhSachRap
+
+GET localhost:8080/api/QuanLyRap/LayDanhSachRap?MaCumRap=<CUM_RAP_ID>
+
+GET localhost:8080/api/QuanLyRap/LayThongTinRap?MaRap=<RAP_ID>
+
+GET localhost:8080/api/QuanLyRap/LayThongTinHeThongRap
+
+GET localhost:8080/api/QuanLyRap/LayThongTinLichChieuPhim?MaPhim=<MOVIE_ID>
+
+POST localhost:8080/api/QuanLyRap/ThemRap
+Body: JSON
+{
+	"tenRap": "Rap 3",
+	"maCumRap": "<CUM_RAP_ID>",
+	"soLuongGhe": 100
+}
+
+PUT localhost:8080/api/QuanLyRap/CapNhatRap
+Body: JSON
+{
+	"maRap": "<RAP_ID>",
+	"tenRap": "Rap 3 Updated",
+	"maCumRap": "<CUM_RAP_ID>",
+	"soLuongGhe": 120
+}
+
+DELETE localhost:8080/api/QuanLyRap/XoaRap?MaRap=<RAP_ID>
+
+
+================ 5) QUAN LY LICH CHIEU =================
+
+GET localhost:8080/api/QuanLyLichChieu/LayDanhSachLichChieu
+
+GET localhost:8080/api/QuanLyLichChieu/LayDanhSachLichChieu?MaPhim=<MOVIE_ID>
+
+GET localhost:8080/api/QuanLyLichChieu/LayThongTinLichChieu?maLichChieu=<LICH_CHIEU_ID>
+
+GET localhost:8080/api/QuanLyLichChieu/LayThongTinLichChieuPhim?MaPhim=<MOVIE_ID>
+
+POST localhost:8080/api/QuanLyLichChieu/ThemLichChieu
+Body: JSON
+{
+	"maPhim": "<MOVIE_ID>",
+	"maRap": "<RAP_ID>",
+	"ngayChieuGioChieu": "2026-12-01T09:30:00.000Z",
+	"giaVe": 90000
+}
+
+PUT localhost:8080/api/QuanLyLichChieu/CapNhatLichChieu
+Body: JSON
+{
+	"maLichChieu": "<LICH_CHIEU_ID>",
+	"maPhim": "<MOVIE_ID>",
+	"maRap": "<RAP_ID>",
+	"ngayChieuGioChieu": "2026-12-01T12:00:00.000Z",
+	"giaVe": 95000
+}
+
+DELETE localhost:8080/api/QuanLyLichChieu/XoaLichChieu?maLichChieu=<LICH_CHIEU_ID>
 
