@@ -12,16 +12,15 @@ import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.use(verifyToken, checkAdmin);
 router.get("/LayDanhSachRap", LayDanhSachRap);
 
 router.get("/LayThongTinRap", LayThongTinRap);
 
-router.post("/ThemRap", ThemRap);
+router.post("/ThemRap", verifyToken, checkAdmin, ThemRap);
 
-router.put("/CapNhatRap", CapNhatRap);
+router.put("/CapNhatRap", verifyToken, checkAdmin, CapNhatRap);
 
-router.delete("/XoaRap", XoaRap);
+router.delete("/XoaRap", verifyToken, checkAdmin, XoaRap);
 
 router.get("/LayThongTinHeThongRap", LayThongTinHeThongRap);
 

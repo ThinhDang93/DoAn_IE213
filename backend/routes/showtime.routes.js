@@ -10,7 +10,6 @@ import {
 import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
-router.use(verifyToken, checkAdmin);
 
 router.get("/LayDanhSachLichChieu", LayDanhSachLichChieu);
 
@@ -18,10 +17,10 @@ router.get("/LayThongTinLichChieu", LayThongTinLichChieu);
 
 router.get("/LayThongTinLichChieuPhim", LayThongTinLichChieuPhim);
 
-router.post("/ThemLichChieu", ThemLichChieu);
+router.post("/ThemLichChieu", verifyToken, checkAdmin, ThemLichChieu);
 
-router.put("/CapNhatLichChieu", CapNhatLichChieu);
+router.put("/CapNhatLichChieu", verifyToken, checkAdmin, CapNhatLichChieu);
 
-router.delete("/XoaLichChieu", XoaLichChieu);
+router.delete("/XoaLichChieu", verifyToken, checkAdmin, XoaLichChieu);
 
 export default router;
