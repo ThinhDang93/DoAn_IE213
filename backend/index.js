@@ -12,7 +12,10 @@ import roomRoutes from "./routes/room.routes.js";
 import showtimeRoutes from "./routes/showtime.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
 import { seedCatalogData } from "./utils/seedCatalogData.js";
+import { seedSeats } from "./utils/seedSeatsData.js";
+import { seedUsers } from "./utils/seedUsersData.js";
 
 dotenv.config();
 
@@ -60,6 +63,7 @@ app.use("/api/QuanLyRap", roomRoutes);
 app.use("/api/QuanLyLichChieu", showtimeRoutes);
 app.use("/api/QuanLyNguoiDung", authRoutes);
 app.use("/api/QuanLyNguoiDung", userRoutes);
+app.use("/api/QuanLyDatVe", bookingRoutes);
 
 app.use((_req, res) => {
     res.status(404).json({
@@ -82,7 +86,9 @@ const bootstrap = async () => {
     const connected = await connectDatabase();
 
     if (connected && process.env.SEED_CATALOG_ON_START !== "false") {
-        await seedCatalogData();
+        const { rooms } = await seedCatalogData();
+        await seedSeats(rooms);
+        await seedUsers();
     }
 
     app.listen(PORT, () => {

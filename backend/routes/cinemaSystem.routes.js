@@ -5,15 +5,16 @@ import {
     ThemHeThongRap,
     XoaHeThongRap,
 } from "../controllers/cinemaSystemsController.js";
+import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/LayThongTinHeThongRap", LayThongTinHeThongRap);
 
-router.post("/ThemHeThongRap", ThemHeThongRap);
+router.post("/ThemHeThongRap", verifyToken, checkAdmin, ThemHeThongRap);
 
-router.put("/CapNhatHeThongRap", CapNhatHeThongRap);
+router.put("/CapNhatHeThongRap", verifyToken, checkAdmin, CapNhatHeThongRap);
 
-router.delete("/XoaHeThongRap", XoaHeThongRap);
+router.delete("/XoaHeThongRap", verifyToken, checkAdmin, XoaHeThongRap);
 
 export default router;

@@ -165,4 +165,6 @@ export const seedCatalogData = async () => {
     const rooms = await seedRooms(complexes);
     const movies = await seedMovies();
     await seedShowtimes(movies, rooms);
+
+    return { systems, complexes, rooms, movies };
 };

@@ -1,5 +1,6 @@
 import express from "express";
 import upload from "../middlewares/multer.js";
+import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 import {
     CapNhatPhimUpload,
     LayDanhSachBanner,
@@ -17,12 +18,30 @@ router.get("/LayThongTinPhim", LayThongTinPhim);
 
 router.get("/LayDanhSachBanner", LayDanhSachBanner);
 
-router.post("/ThemPhimUploadHinh", upload.single("File"), ThemPhimUploadHinh);
+router.post(
+    "/ThemPhimUploadHinh",
+    verifyToken,
+    checkAdmin,
+    upload.single("File"),
+    ThemPhimUploadHinh
+);
 
-router.post("/CapNhatPhimUpload", upload.single("File"), CapNhatPhimUpload);
+router.post(
+    "/CapNhatPhimUpload",
+    verifyToken,
+    checkAdmin,
+    upload.single("File"),
+    CapNhatPhimUpload
+);
 
-router.put("/CapNhatPhimUpload", upload.single("File"), CapNhatPhimUpload);
+router.put(
+    "/CapNhatPhimUpload",
+    verifyToken,
+    checkAdmin,
+    upload.single("File"),
+    CapNhatPhimUpload
+);
 
-router.delete("/XoaPhim", XoaPhim);
+router.delete("/XoaPhim", verifyToken, checkAdmin, XoaPhim);
 
 export default router;
