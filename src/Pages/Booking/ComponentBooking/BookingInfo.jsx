@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllBookingDatabyIDActionThunk,
   toggleSeat,
+  clearSeat,
 } from "../../../redux/reducers/BookingReducer";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { DatVeAPI } from "../../../API/BookingAPI";
+import { TOKEN } from "../../../utils/interceptor";
 
 const BookingInfo = () => {
   const param = useParams();
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
   const { thongTinPhim, danhSachGhe, gheDangChon } = useSelector(
     (state) => state.BookingReducer
@@ -28,7 +33,32 @@ const BookingInfo = () => {
     .filter((g) => gheDangChon.includes(g.maGhe))
     .reduce((sum, g) => sum + g.giaVe, 0);
 
-  console.log(thongTinPhim);
+  const handleDatVe = async () => {
+    if (gheDangChon.length === 0) {
+      alert("Vui lòng chọn ít nhất 1 ghế");
+      return;
+    }
+
+    if (!localStorage.getItem(TOKEN)) {
+      alert("Vui lòng đăng nhập trước khi đặt vé");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await DatVeAPI(param.maLichChieu, gheDangChon);
+      alert("Đặt vé thành công!");
+      dispatch(clearSeat());
+      navigate("/");
+    } catch (error) {
+      const message = error?.response?.data?.message || "Đặt vé thất bại";
+      alert(message);
+      await getAllBookingInfo();
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-12 gap-6 p-6">
@@ -91,8 +121,13 @@ const BookingInfo = () => {
             <b className="text-red-500">Tổng tiền:</b> {total.toLocaleString()}{" "}
             VND
           </p>
-          <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded">
-            Đặt vé
+          <button
+            type="button"
+            disabled={submitting || gheDangChon.length === 0}
+            onClick={handleDatVe}
+            className="mt-4 w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 rounded"
+          >
+            {submitting ? "Đang đặt vé..." : "Đặt vé"}
           </button>
         </div>
       </div>
