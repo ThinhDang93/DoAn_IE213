@@ -50,6 +50,55 @@ export const capNhatThongTinTaiKhoan = async (req, res) => {
     }
 };
 
+export const themNguoiDung = async (req, res) => {
+    try {
+        const { taiKhoan, matKhau, hoTen, email, soDT, maLoaiNguoiDung } = req.body;
+
+        if (!taiKhoan || !matKhau || !hoTen || !email) {
+            return res.status(400).json({
+                statusCode: 400,
+                message: "taiKhoan, matKhau, hoTen, email là bắt buộc.",
+                content: null,
+            });
+        }
+
+        const existingUser = await User.findOne({ $or: [{ taiKhoan }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({
+                statusCode: 400,
+                message: "Tài khoản hoặc email đã tồn tại trong hệ thống.",
+                content: null,
+            });
+        }
+
+        const newUser = new User({
+            taiKhoan,
+            matKhau,
+            hoTen,
+            email,
+            soDT,
+            ...(maLoaiNguoiDung ? { maLoaiNguoiDung } : {}),
+        });
+
+        await newUser.save();
+
+        const userData = newUser.toObject();
+        delete userData.matKhau;
+
+        return res.status(201).json({
+            statusCode: 201,
+            message: "Thêm người dùng thành công.",
+            content: userData,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            statusCode: 500,
+            message: "Lỗi máy chủ nội bộ.",
+            content: error.message,
+        });
+    }
+};
+
 export const layDanhSachNguoiDung = async (_req, res) => {
     try {
         const users = await User.find().select("-matKhau");

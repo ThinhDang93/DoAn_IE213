@@ -1,7 +1,21 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { TOKEN } from "../../utils/interceptor";
+import { clearUser } from "../../redux/reducers/AuthReducer";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.AuthReducer.user);
+
+  const handleLogout = () => {
+    localStorage.removeItem(TOKEN);
+    localStorage.removeItem("user");
+    dispatch(clearUser());
+    navigate("/");
+  };
+
   return (
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -18,19 +32,47 @@ const Navbar = () => {
             CYBER_FILM
           </span>
         </NavLink>
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <NavLink
-            to={"/register"}
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-2.5"
-          >
-            Đăng kí
-          </NavLink>
-          <NavLink
-            to={"/login"}
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Đăng nhập
-          </NavLink>
+        <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          {user ? (
+            <>
+              {user.maLoaiNguoiDung === "QuanTri" && (
+                <NavLink
+                  to={"/admin/film"}
+                  className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 text-center mx-2.5"
+                >
+                  Trang quản trị
+                </NavLink>
+              )}
+              <NavLink
+                to={"/profile"}
+                className="text-blue-700 hover:underline font-medium text-sm px-2"
+              >
+                Xin chào, {user.hoTen}
+              </NavLink>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center"
+              >
+                Đăng xuất
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to={"/register"}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-2.5"
+              >
+                Đăng kí
+              </NavLink>
+              <NavLink
+                to={"/login"}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Đăng nhập
+              </NavLink>
+            </>
+          )}
 
           <button
             data-collapse-toggle="navbar-sticky"

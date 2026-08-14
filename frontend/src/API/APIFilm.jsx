@@ -1,5 +1,10 @@
 import { http } from "../utils/interceptor";
 
+export const LayDanhSachPhimAPI = async () => {
+  const res = await http.get("/api/QuanLyPhim/LayDanhSachPhim");
+  return res.data.content;
+};
+
 export const DeleteFilmAPI = async (maphim) => {
   const res = await http.delete(`/api/QuanLyPhim/XoaPhim?MaPhim=${maphim}`);
 };

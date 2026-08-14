@@ -59,7 +59,7 @@ export const LayDanhSachLichChieu = async (req, res) => {
 
 export const LayThongTinLichChieu = async (req, res) => {
     try {
-        const { maLichChieu } = req.query;
+        const { MaLichChieu: maLichChieu } = req.query;
 
         if (!maLichChieu) {
             return sendError(res, new Error("Missing MaLichChieu"), 400);
@@ -166,7 +166,7 @@ export const CapNhatLichChieu = async (req, res) => {
 
 export const XoaLichChieu = async (req, res) => {
     try {
-        const { maLichChieu } = req.query;
+        const { MaLichChieu: maLichChieu } = req.query;
 
         if (!maLichChieu) {
             return sendError(res, new Error("Missing MaLichChieu"), 400);

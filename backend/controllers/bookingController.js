@@ -2,8 +2,26 @@ import mongoose from "mongoose";
 import Showtime from "../models/showtimes.js";
 import * as SeatService from "../services/SeatService.js";
 import * as BookingService from "../services/BookingService.js";
-import { mapBookingHistory, mapPhongVe } from "../utils/bookingMapper.js";
+import { mapBookingAdmin, mapBookingHistory, mapPhongVe } from "../utils/bookingMapper.js";
 import { sendError, sendSuccess } from "../utils/httpResponse.js";
+
+const buildNgayDatFilter = (query) => {
+    const { TuNgay, DenNgay } = query;
+
+    if (!TuNgay && !DenNgay) {
+        return {};
+    }
+
+    const ngayDat = {};
+    if (TuNgay) {
+        ngayDat.$gte = new Date(TuNgay);
+    }
+    if (DenNgay) {
+        ngayDat.$lte = new Date(DenNgay);
+    }
+
+    return { ngayDat };
+};
 
 const SHOWTIME_ROOM_POPULATE = [
     { path: "maPhim" },
@@ -135,6 +153,71 @@ export const LayLichSuDatVe = async (req, res) => {
         const content = bookings.map((booking) => mapBookingHistory(booking, req));
 
         return sendSuccess(res, content, "Lay lich su dat ve thanh cong");
+    } catch (error) {
+        return sendError(res, error);
+    }
+};
+
+export const HuyVe = async (req, res) => {
+    try {
+        const { MaVe } = req.query;
+
+        if (!MaVe || !mongoose.Types.ObjectId.isValid(MaVe)) {
+            return sendError(res, new Error("MaVe is invalid"), 400);
+        }
+
+        const booking = await BookingService.LayBookingTheoId(MaVe);
+
+        if (!booking) {
+            return sendError(res, new Error("Booking not found"), 404);
+        }
+
+        if (String(booking.taiKhoan) !== String(req.user.id)) {
+            return sendError(res, new Error("Ban khong co quyen huy ve nay"), 403);
+        }
+
+        if (booking.trangThai === "cancelled") {
+            return sendError(res, new Error("Ve nay da bi huy truoc do"), 400);
+        }
+
+        const updated = await BookingService.HuyBooking(booking);
+
+        return sendSuccess(
+            res,
+            { maVe: String(updated._id), trangThai: updated.trangThai },
+            "Huy ve thanh cong"
+        );
+    } catch (error) {
+        return sendError(res, error);
+    }
+};
+
+export const LayDanhSachVeDaBan = async (req, res) => {
+    try {
+        const { MaPhim } = req.query;
+        const filter = buildNgayDatFilter(req.query);
+
+        const bookings = await BookingService.LayDanhSachVeDaBan(filter);
+        let content = bookings.map((booking) => mapBookingAdmin(booking, req));
+
+        if (MaPhim) {
+            content = content.filter(
+                (booking) => booking.thongTinPhim.maPhim === MaPhim
+            );
+        }
+
+        return sendSuccess(res, content, "Lay danh sach ve da ban thanh cong");
+    } catch (error) {
+        return sendError(res, error);
+    }
+};
+
+export const ThongKeDoanhThu = async (req, res) => {
+    try {
+        const filter = buildNgayDatFilter(req.query);
+        const stats = await BookingService.ThongKeDoanhThu(filter);
+
+        return sendSuccess(res, stats, "Thong ke doanh thu thanh cong");
     } catch (error) {
         return sendError(res, error);
     }

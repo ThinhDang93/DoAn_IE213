@@ -3,10 +3,13 @@ import Navbar from "../template/Navbar";
 import Footer from "../template/Footer";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
+import { useDispatch } from "react-redux";
 import { http, TOKEN } from "../../utils/interceptor";
+import { setUser } from "../../redux/reducers/AuthReducer";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const frmLogin = useFormik({
     initialValues: {
@@ -14,25 +17,25 @@ const Login = () => {
       matKhau: "",
     },
     onSubmit: async (values) => {
-      localStorage.removeItem("user", TOKEN);
-      const res = await http.post("/api/QuanLyNguoiDung/DangNhap", values);
-      localStorage.setItem(TOKEN, res.data.content.accessToken);
-      localStorage.setItem("user", JSON.stringify(res.data.content));
-      const userData = res.data.content;
-      console.log(res);
+      try {
+        localStorage.removeItem(TOKEN);
+        localStorage.removeItem("user");
+        const res = await http.post("/api/QuanLyNguoiDung/DangNhap", values);
+        const userData = res.data.content;
 
-      if (
-        userData.maLoaiNguoiDung === "QuanTri" ||
-        userData.maLoaiNguoiDung === "quanTri"
-      ) {
-        navigate("/admin/film"); // Trang quản lý phim
-      } else if (
-        userData.maLoaiNguoiDung === "khachHang" ||
-        userData.maLoaiNguoiDung === "KhachHang"
-      ) {
-        navigate("/"); // Trang chủ
-      } else {
-        alert("Không tìm thấy user");
+        localStorage.setItem(TOKEN, userData.accessToken);
+        localStorage.setItem("user", JSON.stringify(userData));
+        dispatch(setUser(userData));
+
+        if (userData.maLoaiNguoiDung === "QuanTri") {
+          navigate("/admin/film");
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        const message =
+          error?.response?.data?.message || "Đăng nhập thất bại";
+        alert(message);
       }
     },
   });

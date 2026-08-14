@@ -25,6 +25,13 @@ export const mapPhongVe = (showtime, seats, bookedIds) => {
     };
 };
 
+export const mapBookingAdmin = (booking, req) => ({
+    ...mapBookingHistory(booking, req),
+    taiKhoan: booking.taiKhoan?.taiKhoan || "",
+    hoTenKhachHang: booking.taiKhoan?.hoTen || "",
+    emailKhachHang: booking.taiKhoan?.email || "",
+});
+
 export const mapBookingHistory = (booking, req) => {
     const showtime = booking.maLichChieu;
     const room = showtime?.maRap;

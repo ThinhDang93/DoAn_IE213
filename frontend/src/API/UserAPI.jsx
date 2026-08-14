@@ -5,6 +5,11 @@ export const layDanhSachNguoiDungAPI = async () => {
   return res.data.content;
 };
 
+export const themNguoiDungAPI = async (data) => {
+  const res = await http.post("/api/QuanLyNguoiDung/ThemNguoiDung", data);
+  return res.data;
+};
+
 export const capNhatNguoiDungAPI = async (taiKhoan, data) => {
   const res = await http.put(
     `/api/QuanLyNguoiDung/CapNhatNguoiDung?TaiKhoan=${taiKhoan}`,

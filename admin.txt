@@ -1,0 +1,146 @@
+ADMIN.TXT — Kế hoạch hoàn thiện Admin Panel (tích hợp FE có sẵn + BE + DB)
+Dành cho Claude (phiên có quyền truy cập repo FE + BE thật) đọc và tự thực thi.
+Repo FE tham chiếu: https://github.com/ThinhDang93/DoAn_IE213.git (đã audit lại tại commit c43a648).
+
+===========================================================
+0. VIỆC CẦN HỎI LẠI THỊNH TRƯỚC KHI THỰC THI (blocking)
+===========================================================
+- [ ] Link repo Backend thật + tên nhánh hiện tại (nhánh integration đã có Auth+Catalog theo
+      note.md trước đó — xác nhận vẫn dùng nhánh này để code tiếp phần admin).
+- [ ] Admin Booking Management chỉ cần XEM danh sách vé + thống kê doanh thu, hay cần thêm chức
+      năng HUỶ vé từ phía admin? (mặc định trong note này: chỉ xem + thống kê, không huỷ).
+- [ ] Có cần trang "Thêm user mới" từ phía admin không, hay user chỉ tạo qua trang Đăng ký công khai?
+      (SlideBar_Admin.jsx hiện có sẵn 1 mục "Add New" dưới User nhưng href="#", chưa wire — mặc định
+      trong note này: BỎ QUA, không cần trang thêm user từ admin, vì user tự đăng ký).
+
+===========================================================
+1. NGUYÊN TẮC BẮT BUỘC
+===========================================================
+- KHÔNG viết lại phần đã hoạt động (Movie CRUD) — chỉ kiểm tra/kết nối với BE mới.
+- MỌI trang/bảng admin mới PHẢI copy đúng pattern đã verify ở mục 2 bên dưới (MovieManager.jsx +
+  Ad_FilmManagement.jsx + SlideBar_Admin.jsx) để đồng bộ giao diện toàn bộ admin panel — không tự
+  sáng tạo cấu trúc component khác.
+- Áp dụng đúng quy ước casing/response wrapper đã thống nhất trước đó (xem lại note.md mục 2 nếu cần):
+  query param PascalCase, field JSON camelCase, response bọc {statusCode, message, content}.
+
+===========================================================
+2. KẾT QUẢ AUDIT FE ADMIN HIỆN TẠI (đã re-check trực tiếp trong repo trước khi viết note này)
+===========================================================
+
+Route hiện có trong src/App.jsx:
+  /admin/film                  -> Ad_FilmManagement   (HOẠT ĐỘNG — danh sách phim)
+  /admin/film/addnew           -> AddNewFilm           (HOẠT ĐỘNG — thêm phim)
+  /admin/film/update/:maPhim   -> AddNewFilm           (HOẠT ĐỘNG — sửa phim, dùng chung component)
+  /admin/user                  -> Ad_UserManagement    (TRỐNG — chỉ có <SlideBar_Admin />, KHÔNG có
+                                                          bảng/nội dung nào bên trong)
+  KHÔNG có route nào cho: cinema system/complex/room, showtime, booking — chưa tồn tại trong App.jsx.
+
+Pattern đã hoạt động, DÙNG LÀM MẪU để copy cho mọi phần còn lại:
+  - ComponentAdmin/MovieManager.jsx:
+      bảng HTML thuần + Tailwind, lấy danh sách qua Redux thunk (getAllFilmAPIActionThunk), nút
+      "Xoá" gọi thẳng hàm API (DeleteFilmAPI) rồi refetch lại danh sách, nút "Cập nhật"/"+ Thêm" là
+      NavLink điều hướng sang trang form riêng (không mở modal).
+  - ComponentAdmin/FormFilm.jsx:
+      1 component form dùng chung cho cả thêm mới và sửa, phân biệt qua tham số/route (isEdit).
+  - Ad_FilmManagement.jsx — pattern wrapper trang chuẩn:
+      <SlideBar_Admin />
+      <div className="p-4 sm:ml-64"><MovieManager /></div>
+  - SlideBar_Admin.jsx — menu dạng accordion, mỗi domain là 1 <li> với toggleMenu("menuX"), bên
+    trong là <ul> chứa các NavLink con. Hiện có sẵn 2 nhóm:
+      "User" (submenu: "Add New" href="#" CHƯA wire, "User Infomation" -> /admin/user)
+      "Film" (submenu: "Add New" -> /admin/film/addnew, "Film Infomation" -> /admin/film)
+
+File TRỐNG, cần code tiếp (không phải làm mới từ đầu, chỉ thiếu phần nội dung):
+  - Ad_UserManagement.jsx: chỉ có <SlideBar_Admin />, thiếu hẳn phần bảng user — cần thêm
+    UserManager.jsx (copy pattern MovieManager.jsx) rồi render vào đây đúng theo pattern
+    Ad_FilmManagement.jsx.
+
+CHƯA TỒN TẠI, phải tạo mới hoàn toàn cả file lẫn route:
+  - Trang quản lý Hệ thống rạp / Cụm rạp / Phòng chiếu.
+  - Trang quản lý Lịch chiếu — CinemaScheduleReducer.jsx hiện là file rỗng (0 byte), đúng chỗ để
+    code state cho phần này.
+  - Trang quản lý vé đã bán / thống kê doanh thu.
+
+LƯU Ý QUAN TRỌNG ảnh hưởng TOÀN BỘ API admin (cũ lẫn mới), cần xử lý trước hoặc song song:
+  - src/utils/interceptor.jsx (đã re-check, vẫn y nguyên như trước, CHƯA được sửa):
+      1. DOMAIN vẫn đang trỏ "https://movienew.cybersoft.edu.vn" (API CyberSoft cũ) — cần đổi
+         sang URL BE mới khi BE đã deploy.
+      2. Biến "token" vẫn đọc localStorage MỘT LẦN lúc load module, không đọc lại mỗi request —
+         bug này khiến các API cần xác thực (toàn bộ API admin) gửi "Bearer null" nếu user vừa
+         đăng nhập mà chưa F5 lại trang. Phải sửa thành đọc token bên trong interceptor callback.
+  - Cả 2 điểm trên không sửa thì KHÔNG API admin nào (kể cả các API mới ở note này) hoạt động đúng.
+
+===========================================================
+3. VIỆC CẦN LÀM — THEO TỪNG DOMAIN
+===========================================================
+
+--- A. Admin User Management (domain Auth) ---
+Backend (MỚI):
+  GET    /api/QuanLyNguoiDung/LayDanhSachNguoiDung     (cần token + checkAdmin)
+  PUT    /api/QuanLyNguoiDung/CapNhatNguoiDung?TaiKhoan=xx
+  DELETE /api/QuanLyNguoiDung/XoaNguoiDung?TaiKhoan=xx
+  -> response content KHÔNG BAO GIỜ chứa field matKhau.
+Database: dùng lại collection "users" đã có sẵn, không cần field mới.
+Frontend (code mới, copy 1:1 pattern Movie):
+  - src/API/APIUser.jsx           (copy pattern APIFilm.jsx: GetAllUserAPI, DeleteUserAPI, UpdateUserAPI)
+  - src/redux/reducers/UserReducer.jsx (copy pattern FilmReducer.jsx: getAllUserAPIActionThunk)
+  - ComponentAdmin/UserManager.jsx (copy 1:1 cấu trúc MovieManager.jsx, đổi cột bảng thành:
+    taiKhoan, hoTen, email, soDT, maLoaiNguoiDung, nút Sửa + Xoá)
+  - Sửa Ad_UserManagement.jsx: thêm <div className="p-4 sm:ml-64"><UserManager /></div> — hiện
+    đang thiếu hẳn dòng này.
+
+--- B. Admin Catalog Management (domain Movies) ---
+
+B.1 Movie CRUD — ĐÃ HOẠT ĐỘNG, KHÔNG code lại. Chỉ cần:
+  - Khi BE Catalog đã deploy, đổi DOMAIN trong interceptor.jsx sang BE mới.
+  - Verify lại field ảnh (key "File") và định dạng ngày gửi lên (dd/MM/yyyy) khớp đúng BE mới.
+
+B.2 Cinema System / Complex / Room CRUD — MỚI HOÀN TOÀN
+Backend: CRUD đầy đủ cho 3 collection cinemaSystems / cinemaComplexes / rooms.
+Frontend (copy pattern Movie 1:1):
+  - src/API/APICinema.jsx, CinemaReducer.jsx, ComponentAdmin/CinemaManager.jsx (bảng),
+    ComponentAdmin/FormCinema.jsx (form thêm/sửa)
+  - Ad_CinemaManagement.jsx (copy pattern Ad_FilmManagement.jsx)
+  - Route mới trong App.jsx: admin/cinema, admin/cinema/addnew, admin/cinema/update/:maCumRap
+  - Thêm 1 <li> menu mới trong SlideBar_Admin.jsx (copy cấu trúc menu "Film", đổi label thành
+    "Rạp chiếu")
+
+B.3 Showtime CRUD — MỚI HOÀN TOÀN
+Backend: CRUD cho collection showtimes.
+Frontend: tương tự B.2 — dùng CinemaScheduleReducer.jsx (đang trống) làm reducer chính, thêm
+  ComponentAdmin/ShowtimeManager.jsx + FormShowtime.jsx, route admin/showtime..., thêm menu
+  "Lịch chiếu" vào sidebar.
+
+--- C. Admin Booking Management (domain Booking) ---
+Backend (MỚI):
+  GET /api/QuanLyDatVe/LayDanhSachVeDaBan   (toàn bộ vé đã bán, có thể filter theo ngày/phim)
+  GET /api/QuanLyDatVe/ThongKeDoanhThu      (tổng doanh thu + số vé, filter theo khoảng thời gian)
+Frontend (code mới):
+  - ComponentAdmin/BookingManager.jsx (bảng liệt kê vé — không cần form thêm/sửa vì vé được tạo từ
+    phía khách hàng, chỉ xem; xác nhận lại với Thịnh theo mục 0 nếu cần thêm nút Huỷ vé)
+  - Ad_BookingManagement.jsx (wrapper pattern chuẩn), route admin/booking, thêm menu "Vé đã bán"
+    vào sidebar.
+
+===========================================================
+4. CHECKLIST HOÀN THÀNH
+===========================================================
+[ ] Sửa interceptor.jsx (đổi DOMAIN, sửa bug đọc token 1 lần) — làm TRƯỚC TIÊN vì ảnh hưởng mọi API.
+[ ] Admin User: BE 3 endpoint + FE UserManager hoạt động, đã gắn vào Ad_UserManagement.jsx.
+[ ] Movie CRUD verify lại chạy đúng với BE Catalog mới (không code lại).
+[ ] Admin Cinema (System/Complex/Room): BE CRUD + FE CinemaManager + route + menu.
+[ ] Admin Showtime: BE CRUD + FE ShowtimeManager + route + menu.
+[ ] Admin Booking: BE 2 endpoint (danh sách vé + thống kê) + FE BookingManager + route + menu.
+[ ] Mọi route admin phía BE có middleware checkAdmin bảo vệ.
+[ ] Test bằng tài khoản QuanTri: đăng nhập -> vào lần lượt từng trang admin -> thêm/sửa/xoá thử ở
+    mỗi domain -> xác nhận dữ liệu đúng cả trong DB lẫn khi hiển thị lại (F5 trang, không chỉ đổi
+    tạm trên UI).
+
+===========================================================
+5. TEST CUỐI CÙNG TRƯỚC KHI COI LÀ HOÀN THÀNH
+===========================================================
+1. Đăng nhập tài khoản QuanTri -> sidebar admin hiện đủ 5 mục: User, Film, Rạp chiếu, Lịch chiếu,
+   Vé đã bán.
+2. Từng mục: bấm vào, danh sách load được từ DB thật (không phải data cứng), thêm/sửa/xoá thử
+   1 bản ghi, F5 lại xác nhận thay đổi được lưu thật.
+3. Đăng nhập bằng tài khoản KhachHang (không phải QuanTri) -> xác nhận KHÔNG truy cập được các
+   route /admin/* (bị chặn bởi checkAdmin phía BE, hoặc redirect phía FE nếu có).

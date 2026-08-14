@@ -1,12 +1,26 @@
 import { useState } from "react";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { TOKEN } from "../../../utils/interceptor";
+import { clearUser } from "../../../redux/reducers/AuthReducer";
 
 const SlideBar_Admin = () => {
   const [openMenu, setOpenMenu] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.AuthReducer.user);
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(TOKEN);
+    localStorage.removeItem("user");
+    dispatch(clearUser());
+    navigate("/login");
   };
 
   return (
@@ -49,13 +63,13 @@ const SlideBar_Admin = () => {
               </NavLink>
             </div>
             <div className="flex items-center">
-              <div className="flex items-center ms-3">
+              <div className="flex items-center ms-3 relative">
                 <div>
                   <button
                     type="button"
                     className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                    aria-expanded="false"
-                    data-dropdown-toggle="dropdown-user"
+                    aria-expanded={dropdownOpen}
+                    onClick={() => setDropdownOpen((prev) => !prev)}
                   >
                     <span className="sr-only">Open user menu</span>
                     <img
@@ -66,7 +80,9 @@ const SlideBar_Admin = () => {
                   </button>
                 </div>
                 <div
-                  className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
+                  className={`${
+                    dropdownOpen ? "" : "hidden"
+                  } absolute right-0 top-10 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600 min-w-48`}
                   id="dropdown-user"
                 >
                   <div className="px-4 py-3" role="none">
@@ -74,51 +90,25 @@ const SlideBar_Admin = () => {
                       className="text-sm text-gray-900 dark:text-white"
                       role="none"
                     >
-                      Neil Sims
+                      {user?.hoTen || "Quản trị viên"}
                     </p>
                     <p
                       className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                       role="none"
                     >
-                      neil.sims@flowbite.com
+                      {user?.email || ""}
                     </p>
                   </div>
                   <ul className="py-1" role="none">
                     <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                         role="menuitem"
                       >
-                        Dashboard
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                        role="menuitem"
-                      >
-                        Settings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                        role="menuitem"
-                      >
-                        Earnings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                        role="menuitem"
-                      >
-                        Sign out
-                      </a>
+                        Đăng xuất
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -177,12 +167,12 @@ const SlideBar_Admin = () => {
                   }`}
                 >
                   <li>
-                    <a
-                      href="#"
+                    <NavLink
+                      to={"/admin/user/addnew"}
                       className="block p-2 rounded text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Add New
-                    </a>
+                    </NavLink>
                   </li>
                   <li>
                     <NavLink
@@ -253,11 +243,83 @@ const SlideBar_Admin = () => {
                   </li>
                 </ul>
               </li>
+              <li>
+                <NavLink
+                  to={"/admin/cinema"}
+                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="shrink-0 w-5 h-5 text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M3 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H3Zm2 3h2v2H5V6Zm4 0h2v2H9V6Zm4 0h2v2h-2V6ZM5 10h2v2H5v-2Zm4 0h2v2H9v-2Zm4 0h2v2h-2v-2ZM5 14h10v2H5v-2Z" />
+                    </svg>
+                    <span>Rạp chiếu</span>
+                  </span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={"/admin/showtime"}
+                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="shrink-0 w-5 h-5 text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm1 8V5a1 1 0 1 0-2 0v6a1 1 0 0 0 .553.894l4 2a1 1 0 0 0 .894-1.788L11 10Z" />
+                    </svg>
+                    <span>Lịch chiếu</span>
+                  </span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={"/admin/booking"}
+                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="shrink-0 w-5 h-5 text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 4a2 2 0 0 0-2 2v1.5a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 1 0 3A1.5 1.5 0 0 0 2 13.5V15a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5a1.5 1.5 0 0 0-1.5-1.5 1.5 1.5 0 0 1 0-3A1.5 1.5 0 0 0 18 7.5V6a2 2 0 0 0-2-2H4Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>Vé đã bán</span>
+                  </span>
+                </NavLink>
+              </li>
             </div>
             <li>
               <NavLink
-                to="/login"
+                to="/"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
+                <span className="flex-1 ms-3 whitespace-nowrap">
+                  Về trang chủ
+                </span>
+              </NavLink>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
                   className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -274,27 +336,10 @@ const SlideBar_Admin = () => {
                     d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
                   />
                 </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Sign In</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/register"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
-                  <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z" />
-                  <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Sign Up</span>
-              </NavLink>
+                <span className="flex-1 ms-3 whitespace-nowrap text-left">
+                  Đăng xuất
+                </span>
+              </button>
             </li>
           </ul>
         </div>
