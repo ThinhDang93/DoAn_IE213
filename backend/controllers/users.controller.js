@@ -70,7 +70,11 @@ export const layDanhSachNguoiDung = async (_req, res) => {
 
 export const capNhatNguoiDung = async (req, res) => {
     try {
-        const taiKhoan = req.query.TaiKhoan;
+        const taiKhoan =
+            req.query?.TaiKhoan ||
+            req.query?.taiKhoan ||
+            req.body?.TaiKhoan ||
+            req.body?.taiKhoan;
 
         if (!taiKhoan) {
             return res.status(400).json({
@@ -81,9 +85,9 @@ export const capNhatNguoiDung = async (req, res) => {
         }
 
         const updateData = { ...req.body };
-        if (updateData.matKhau) {
-            delete updateData.matKhau;
-        }
+        delete updateData.matKhau;
+        delete updateData.taiKhoan;
+        delete updateData.TaiKhoan;
 
         const updatedUser = await User.findOneAndUpdate(
             { taiKhoan },
@@ -115,7 +119,11 @@ export const capNhatNguoiDung = async (req, res) => {
 
 export const xoaNguoiDung = async (req, res) => {
     try {
-        const taiKhoan = req.query.TaiKhoan;
+        const taiKhoan =
+            req.query?.TaiKhoan ||
+            req.query?.taiKhoan ||
+            req.body?.TaiKhoan ||
+            req.body?.taiKhoan;
 
         if (!taiKhoan) {
             return res.status(400).json({
