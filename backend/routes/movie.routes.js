@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../middlewares/multer.js";
+import { uploadMovie as upload } from "../middlewares/multer.js";
 import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 import {
     CapNhatPhimUpload,

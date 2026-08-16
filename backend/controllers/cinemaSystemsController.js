@@ -37,8 +37,9 @@ export const LayThongTinHeThongRap = async (req, res) => {
 export const ThemHeThongRap = async (req, res) => {
     try {
         const { tenHeThongRap, logo } = req.body;
+        const logoUrl = req.file ? req.file.path : logo;
 
-        if (!tenHeThongRap || !logo) {
+        if (!tenHeThongRap || !logoUrl) {
             return sendError(
                 res,
                 new Error("tenHeThongRap va logo la bat buoc"),
@@ -48,7 +49,7 @@ export const ThemHeThongRap = async (req, res) => {
 
         const createdSystem = await CinemaSystemService.ThemHeThongRap({
             tenHeThongRap,
-            logo,
+            logo: logoUrl,
         });
 
         return sendSuccess(
@@ -65,6 +66,7 @@ export const ThemHeThongRap = async (req, res) => {
 export const CapNhatHeThongRap = async (req, res) => {
     try {
         const { maHeThongRap, tenHeThongRap, logo } = req.body;
+        const logoUrl = req.file ? req.file.path : logo;
 
         if (!maHeThongRap) {
             return sendError(res, new Error("Missing maHeThongRap"), 400);
@@ -78,7 +80,7 @@ export const CapNhatHeThongRap = async (req, res) => {
             maHeThongRap,
             {
                 ...(tenHeThongRap !== undefined ? { tenHeThongRap } : {}),
-                ...(logo !== undefined ? { logo } : {}),
+                ...(logoUrl !== undefined ? { logo: logoUrl } : {}),
             }
         );
 

@@ -25,6 +25,12 @@ const btnGreen =
 const btnRed =
   "text-red-700 hover:text-white border-2 border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5";
 
+const getPreviewUrl = (value) => {
+  if (!value) return "";
+  if (value instanceof File) return URL.createObjectURL(value);
+  return value;
+};
+
 const CinemaManager = () => {
   const [systems, setSystems] = useState([]);
   const [complexes, setComplexes] = useState([]);
@@ -182,15 +188,24 @@ const CinemaManager = () => {
             className="border rounded-lg p-2 flex-1 min-w-48"
             required
           />
-          <input
-            placeholder="URL logo"
-            value={systemForm.logo}
-            onChange={(e) =>
-              setSystemForm({ ...systemForm, logo: e.target.value })
-            }
-            className="border rounded-lg p-2 flex-1 min-w-48"
-            required
-          />
+          <div className="flex items-center gap-2 flex-1 min-w-48">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setSystemForm({ ...systemForm, logo: e.target.files[0] })
+              }
+              className="border rounded-lg p-2 flex-1"
+              required={!editingSystem}
+            />
+            {systemForm.logo && (
+              <img
+                src={getPreviewUrl(systemForm.logo)}
+                alt="preview"
+                className="w-10 h-10 object-contain border rounded shrink-0"
+              />
+            )}
+          </div>
           <button type="submit" className={btnPrimary}>
             {editingSystem ? "Cập nhật" : "+ Thêm"}
           </button>
@@ -263,14 +278,23 @@ const CinemaManager = () => {
             className="border rounded-lg p-2 flex-1 min-w-40"
             required
           />
-          <input
-            placeholder="URL hình ảnh"
-            value={complexForm.hinhAnh}
-            onChange={(e) =>
-              setComplexForm({ ...complexForm, hinhAnh: e.target.value })
-            }
-            className="border rounded-lg p-2 flex-1 min-w-40"
-          />
+          <div className="flex items-center gap-2 flex-1 min-w-40">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setComplexForm({ ...complexForm, hinhAnh: e.target.files[0] })
+              }
+              className="border rounded-lg p-2 flex-1"
+            />
+            {complexForm.hinhAnh && (
+              <img
+                src={getPreviewUrl(complexForm.hinhAnh)}
+                alt="preview"
+                className="w-10 h-10 object-contain border rounded shrink-0"
+              />
+            )}
+          </div>
           <select
             value={complexForm.maHeThongRap}
             onChange={(e) =>

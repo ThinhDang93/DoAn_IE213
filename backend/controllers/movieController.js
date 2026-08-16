@@ -63,7 +63,7 @@ const buildMoviePayload = (body, file) => {
     }
 
     if (file) {
-        payload.hinhAnh = `uploads/movies/${file.filename}`;
+        payload.hinhAnh = file.path;
     }
 
     return payload;

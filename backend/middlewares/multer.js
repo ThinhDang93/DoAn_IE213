@@ -1,26 +1,30 @@
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
-import path from "path";
 
-const moviesUploadDir = path.resolve(process.cwd(), "uploads/movies");
-fs.mkdirSync(moviesUploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-    destination: (_req, _file, callback) => {
-        callback(null, moviesUploadDir);
-    },
-    filename: (_req, file, callback) => {
-        const fileExtension = path.extname(file.originalname) || ".jpg";
-        const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        callback(null, `${safeName}${fileExtension}`);
-    },
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = multer({
-    storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024,
-    },
-});
+const createUploader = (folder) => {
+    const storage = new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: `datvexemphim/${folder}`,
+            allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        },
+    });
 
-export default upload;
+    return multer({
+        storage,
+        limits: {
+            fileSize: 10 * 1024 * 1024,
+        },
+    });
+};
+
+export const uploadMovie = createUploader("movies");
+export const uploadCinemaSystem = createUploader("cinema-systems");
+export const uploadCinemaComplex = createUploader("cinema-complexes");

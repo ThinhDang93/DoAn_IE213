@@ -31,7 +31,7 @@ Cài **từng thư mục riêng** — không chạy `npm install`/`yarn install`
 ```bash
 # Backend
 cd backend
-npm install
+npm install --legacy-peer-deps
 
 # Frontend (mở terminal/tab khác, hoặc cd ra lại rồi vào frontend)
 cd ../frontend
@@ -39,6 +39,8 @@ yarn install
 ```
 
 `npm install` và `yarn install` sẽ tự cài đúng version các package theo `package-lock.json` (backend) / `yarn.lock` (frontend) đã có sẵn trong repo — không cần tự chọn version.
+
+> Backend cần cờ `--legacy-peer-deps` vì package `multer-storage-cloudinary` khai báo peer dependency `cloudinary@^1.x` trong khi mình dùng `cloudinary@^2.x` (đã test kỹ, chạy đúng — chỉ là cảnh báo version, không phải lỗi thật). Không thêm cờ này thì `npm install` sẽ báo lỗi ERESOLVE và dừng lại.
 
 ## 3. Cấu hình file `.env`
 
@@ -51,7 +53,12 @@ PORT=8080
 MONGO_URI=<Thịnh gửi connection string MongoDB Atlas>
 JWT_SECRET=<Thịnh gửi>
 SEED_CATALOG_ON_START=true
+CLOUDINARY_CLOUD_NAME=<Thịnh gửi>
+CLOUDINARY_API_KEY=<Thịnh gửi>
+CLOUDINARY_API_SECRET=<Thịnh gửi>
 ```
+
+3 biến `CLOUDINARY_*` dùng để upload ảnh (phim, logo hệ thống rạp, ảnh cụm rạp) lên Cloudinary — thiếu 1 trong 3 biến này thì mọi chức năng upload ảnh sẽ báo lỗi 500 "Must supply api_key".
 
 ### `frontend/.env`
 
@@ -115,3 +122,5 @@ npm run seed
 - **Backend log `MongoDB connection failed`** → sai `MONGO_URI` trong `backend/.env`, hoặc IP máy bạn chưa được thêm vào Network Access của Atlas (báo Thịnh để thêm `0.0.0.0/0`).
 - **Frontend gọi API bị lỗi/CORS/404** → kiểm tra backend đã chạy chưa (Terminal 1) và `VITE_API_URL` trong `frontend/.env` đúng cổng `8080`.
 - **Đăng nhập xong gọi API vẫn báo 401** → thử đăng xuất (xoá `localStorage`) rồi đăng nhập lại; nếu vẫn lỗi, báo lại nhóm.
+- **Upload ảnh báo lỗi 500 "Must supply api_key"** → thiếu/sai 1 trong 3 biến `CLOUDINARY_*` trong `backend/.env`.
+- **`npm install` báo lỗi ERESOLVE ở backend** → quên cờ `--legacy-peer-deps`, chạy lại `npm install --legacy-peer-deps`.

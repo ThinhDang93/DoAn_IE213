@@ -56,6 +56,7 @@ export const LayThongTinCumRap = async (req, res) => {
 export const ThemCumRap = async (req, res) => {
     try {
         const { tenCumRap, diaChi, hinhAnh = "", maHeThongRap } = req.body;
+        const hinhAnhUrl = req.file ? req.file.path : hinhAnh;
 
         if (!tenCumRap || !diaChi || !maHeThongRap) {
             return sendError(
@@ -72,7 +73,7 @@ export const ThemCumRap = async (req, res) => {
         const createdComplex = await CinemaComplexService.ThemCumRap({
             tenCumRap,
             diaChi,
-            hinhAnh,
+            hinhAnh: hinhAnhUrl,
             maHeThongRap,
         });
 
@@ -90,6 +91,7 @@ export const ThemCumRap = async (req, res) => {
 export const CapNhatCumRap = async (req, res) => {
     try {
         const { maCumRap, tenCumRap, diaChi, hinhAnh, maHeThongRap } = req.body;
+        const hinhAnhUrl = req.file ? req.file.path : hinhAnh;
 
         if (!maCumRap) {
             return sendError(res, new Error("Missing maCumRap"), 400);
@@ -106,7 +108,7 @@ export const CapNhatCumRap = async (req, res) => {
         const updatedComplex = await CinemaComplexService.CapNhatCumRap(maCumRap, {
             ...(tenCumRap !== undefined ? { tenCumRap } : {}),
             ...(diaChi !== undefined ? { diaChi } : {}),
-            ...(hinhAnh !== undefined ? { hinhAnh } : {}),
+            ...(hinhAnhUrl !== undefined ? { hinhAnh: hinhAnhUrl } : {}),
             ...(maHeThongRap !== undefined ? { maHeThongRap } : {}),
         });
 

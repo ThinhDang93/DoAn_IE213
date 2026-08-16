@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 *.env
+
+# Backend local file uploads (migrated to Cloudinary)
+backend/uploads

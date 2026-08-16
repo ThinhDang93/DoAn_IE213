@@ -1,10 +1,9 @@
+import "dotenv/config";
 import dns from 'dns';
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
-import path from "path";
 import cinemaComplexRoutes from "./routes/cinemaComplex.routes.js";
 import cinemaSystemRoutes from "./routes/cinemaSystem.routes.js";
 import movieRoutes from "./routes/movie.routes.js";
@@ -16,8 +15,6 @@ import bookingRoutes from "./routes/booking.routes.js";
 import { seedCatalogData } from "./utils/seedCatalogData.js";
 import { seedSeats } from "./utils/seedSeatsData.js";
 import { seedUsers } from "./utils/seedUsersData.js";
-
-dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
@@ -45,8 +42,6 @@ const connectDatabase = async () => {
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 app.get("/", (_req, res) => {
     res.status(200).json({
