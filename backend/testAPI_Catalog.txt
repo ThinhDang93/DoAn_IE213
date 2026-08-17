@@ -134,8 +134,6 @@ DELETE localhost:8080/api/QuanLyRap/XoaRap?MaRap=<RAP_ID>
 
 GET localhost:8080/api/QuanLyLichChieu/LayDanhSachLichChieu
 
-GET localhost:8080/api/QuanLyLichChieu/LayDanhSachLichChieu?MaPhim=<MOVIE_ID>
-
 GET localhost:8080/api/QuanLyLichChieu/LayThongTinLichChieu?maLichChieu=<LICH_CHIEU_ID>
 
 GET localhost:8080/api/QuanLyLichChieu/LayThongTinLichChieuPhim?MaPhim=<MOVIE_ID>
