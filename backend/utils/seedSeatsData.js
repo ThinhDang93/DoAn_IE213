@@ -4,7 +4,7 @@ const SEATS_PER_ROW = 10;
 const GIA_VE_THUONG = 75000;
 const GIA_VE_VIP = 95000;
 
-const buildSeatsForRoom = (room) => {
+export const buildSeatsForRoom = (room) => {
     const rowCount = Math.max(1, Math.ceil(room.soLuongGhe / SEATS_PER_ROW));
     const seats = [];
 
@@ -43,4 +43,28 @@ export const seedSeats = async (rooms) => {
     if (docs.length > 0) {
         await Seat.insertMany(docs);
     }
+};
+
+// Dam bao du so ghe theo soLuongGhe hien tai cua room. Chi THEM/CAP NHAT
+// (upsert theo cap {maRap, tenGhe}), khong bao gio xoa ghe da co - tranh
+// lam hong tham chieu maGhe trong cac booking da tao truoc do.
+export const syncSeatsForRoom = async (room) => {
+    const desiredSeats = buildSeatsForRoom(room);
+
+    if (desiredSeats.length === 0) {
+        return;
+    }
+
+    const ops = desiredSeats.map((seat) => ({
+        updateOne: {
+            filter: { maRap: seat.maRap, tenGhe: seat.tenGhe },
+            update: {
+                $set: { loaiGhe: seat.loaiGhe, giaVe: seat.giaVe },
+                $setOnInsert: { maRap: seat.maRap, tenGhe: seat.tenGhe },
+            },
+            upsert: true,
+        },
+    }));
+
+    await Seat.bulkWrite(ops);
 };

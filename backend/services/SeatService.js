@@ -9,6 +9,10 @@ export const LayGheTheoIds = async (ids) => {
     return Seat.find({ _id: { $in: ids } }).lean();
 };
 
+export const XoaGheTheoRap = async (maRap) => {
+    return Seat.deleteMany({ maRap });
+};
+
 export const LayTapMaGheDaDat = async (maLichChieu) => {
     const bookings = await Booking.find({
         maLichChieu,

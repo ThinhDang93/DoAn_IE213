@@ -1,4 +1,7 @@
 import * as ShowtimeService from "../services/ShowtimeService.js";
+import * as MovieService from "../services/MovieService.js";
+import * as RoomService from "../services/RoomService.js";
+import * as BookingService from "../services/BookingService.js";
 import {
     buildShowtimeTreeByMovie,
     mapShowtime,
@@ -110,6 +113,18 @@ export const ThemLichChieu = async (req, res) => {
             return sendError(res, new Error("maRap is invalid"), 400);
         }
 
+        const movie = await MovieService.LayThongTinPhim(payload.maPhim);
+
+        if (!movie) {
+            return sendError(res, new Error("Phim khong ton tai"), 400);
+        }
+
+        const room = await RoomService.LayThongTinRap(payload.maRap);
+
+        if (!room) {
+            return sendError(res, new Error("Phong chieu khong ton tai"), 400);
+        }
+
         const createdShowtime = await ShowtimeService.ThemLichChieu(payload);
 
         return sendSuccess(
@@ -137,12 +152,28 @@ export const CapNhatLichChieu = async (req, res) => {
 
         const payload = buildShowtimePayload(req.body);
 
-        if (payload.maPhim && !mongoose.Types.ObjectId.isValid(payload.maPhim)) {
-            return sendError(res, new Error("maPhim is invalid"), 400);
+        if (payload.maPhim) {
+            if (!mongoose.Types.ObjectId.isValid(payload.maPhim)) {
+                return sendError(res, new Error("maPhim is invalid"), 400);
+            }
+
+            const movie = await MovieService.LayThongTinPhim(payload.maPhim);
+
+            if (!movie) {
+                return sendError(res, new Error("Phim khong ton tai"), 400);
+            }
         }
 
-        if (payload.maRap && !mongoose.Types.ObjectId.isValid(payload.maRap)) {
-            return sendError(res, new Error("maRap is invalid"), 400);
+        if (payload.maRap) {
+            if (!mongoose.Types.ObjectId.isValid(payload.maRap)) {
+                return sendError(res, new Error("maRap is invalid"), 400);
+            }
+
+            const room = await RoomService.LayThongTinRap(payload.maRap);
+
+            if (!room) {
+                return sendError(res, new Error("Phong chieu khong ton tai"), 400);
+            }
         }
 
         const updatedShowtime = await ShowtimeService.CapNhatLichChieu(
@@ -174,6 +205,18 @@ export const XoaLichChieu = async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(maLichChieu)) {
             return sendError(res, new Error("MaLichChieu is invalid"), 400);
+        }
+
+        const soVeChuaHuy = await BookingService.DemVeChuaHuyTheoLichChieu(
+            maLichChieu
+        );
+
+        if (soVeChuaHuy > 0) {
+            return sendError(
+                res,
+                new Error("Lich chieu dang co ve da dat, khong the xoa"),
+                400
+            );
         }
 
         const deletedShowtime = await ShowtimeService.XoaLichChieu(maLichChieu);

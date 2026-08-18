@@ -1,4 +1,5 @@
 import * as CinemaSystemService from "../services/CinemaSystemService.js";
+import * as CinemaComplexService from "../services/CinemaComplexService.js";
 import { mapCinemaSystem } from "../utils/catalogMapper.js";
 import { sendError, sendSuccess } from "../utils/httpResponse.js";
 import mongoose from "mongoose";
@@ -108,6 +109,18 @@ export const XoaHeThongRap = async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(MaHeThongRap)) {
             return sendError(res, new Error("MaHeThongRap is invalid"), 400);
+        }
+
+        const complexes = await CinemaComplexService.LayDanhSachCumRap({
+            maHeThongRap: MaHeThongRap,
+        });
+
+        if (complexes.length > 0) {
+            return sendError(
+                res,
+                new Error("He thong rap dang co cum rap, khong the xoa"),
+                400
+            );
         }
 
         const deletedSystem = await CinemaSystemService.XoaHeThongRap(MaHeThongRap);

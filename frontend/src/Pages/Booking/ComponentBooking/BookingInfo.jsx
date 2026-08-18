@@ -29,9 +29,24 @@ const BookingInfo = () => {
     getAllBookingInfo();
   }, [param.maLichChieu]);
 
-  const total = danhSachGhe
-    .filter((g) => gheDangChon.includes(g.maGhe))
-    .reduce((sum, g) => sum + g.giaVe, 0);
+  const gheDaChonInfo = danhSachGhe.filter((g) =>
+    gheDangChon.includes(g.maGhe)
+  );
+  const total = gheDaChonInfo.reduce((sum, g) => sum + g.giaVe, 0);
+  const tenGheDaChon = gheDaChonInfo.map((g) => g.tenGhe).join(", ");
+
+  const SEAT_COLUMNS = 10;
+  const seatGrid = {};
+  const rowSet = new Set();
+  danhSachGhe.forEach((ghe) => {
+    const match = ghe.tenGhe?.match(/^([A-Za-z]+)(\d+)$/);
+    if (!match) return;
+    const [, row, col] = match;
+    rowSet.add(row);
+    seatGrid[row] = seatGrid[row] || {};
+    seatGrid[row][Number(col)] = ghe;
+  });
+  const sortedRows = Array.from(rowSet).sort();
 
   const handleDatVe = async () => {
     if (gheDangChon.length === 0) {
@@ -68,29 +83,63 @@ const BookingInfo = () => {
         <div className="bg-gray-800 text-white text-center py-2 rounded-md mb-4">
           MÀN HÌNH
         </div>
-        <div className="grid grid-cols-16 justify-items-center gap-1">
-          {danhSachGhe.map((ghe) => {
-            const isSelected = gheDangChon.includes(ghe.maGhe);
-            return (
-              <button
-                key={ghe.maGhe}
-                disabled={ghe.daDat}
-                onClick={() => dispatch(toggleSeat(ghe.maGhe))}
-                className={`w-12 h-12 rounded text-sm 
-                  ${
-                    ghe.daDat
-                      ? "bg-gray-500 cursor-not-allowed text-white"
-                      : isSelected
-                      ? "bg-red-500 text-white"
-                      : ghe.loaiGhe === "Vip"
-                      ? "bg-yellow-400 hover:bg-yellow-500"
-                      : "bg-green-400 hover:bg-green-500"
-                  }`}
-              >
-                {ghe.daDat ? "X" : ghe.tenGhe}
-              </button>
-            );
-          })}
+        <div className="flex flex-col items-center gap-2">
+          {sortedRows.map((row) => (
+            <div key={row} className="flex items-center gap-2">
+              <span className="w-5 font-bold text-center">{row}</span>
+              <div className="flex gap-1">
+                {Array.from({ length: SEAT_COLUMNS }, (_, i) => i + 1).map(
+                  (col) => {
+                    const ghe = seatGrid[row]?.[col];
+                    if (!ghe) {
+                      return <div key={col} className="w-12 h-12" />;
+                    }
+                    const isSelected = gheDangChon.includes(ghe.maGhe);
+                    return (
+                      <button
+                        key={ghe.maGhe}
+                        type="button"
+                        disabled={ghe.daDat}
+                        onClick={() => dispatch(toggleSeat(ghe.maGhe))}
+                        title={ghe.tenGhe}
+                        className={`w-12 h-12 rounded text-sm
+                          ${
+                            ghe.daDat
+                              ? "bg-gray-500 cursor-not-allowed text-white"
+                              : isSelected
+                              ? "bg-red-500 text-white"
+                              : ghe.loaiGhe === "Vip"
+                              ? "bg-yellow-400 hover:bg-yellow-500"
+                              : "bg-green-400 hover:bg-green-500"
+                          }`}
+                      >
+                        {ghe.daDat ? "X" : ghe.tenGhe}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center gap-6 mt-4 text-sm">
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-4 rounded bg-green-400 inline-block" />
+            Ghế thường
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-4 rounded bg-yellow-400 inline-block" />
+            Ghế Vip
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-4 rounded bg-red-500 inline-block" />
+            Đang chọn
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-4 rounded bg-gray-500 inline-block" />
+            Đã đặt
+          </span>
         </div>
       </div>
 
@@ -115,7 +164,7 @@ const BookingInfo = () => {
             {thongTinPhim.gioChieu}
           </p>
           <p>
-            <b>Ghế đã chọn:</b> {gheDangChon.join(", ") || "Chưa chọn"}
+            <b>Ghế đã chọn:</b> {tenGheDaChon || "Chưa chọn"}
           </p>
           <p>
             <b className="text-red-500">Tổng tiền:</b> {total.toLocaleString()}{" "}

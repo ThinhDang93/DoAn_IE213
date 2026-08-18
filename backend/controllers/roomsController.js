@@ -1,6 +1,8 @@
 import * as RoomService from "../services/RoomService.js";
 import * as CinemaSystemService from "../services/CinemaSystemService.js";
+import * as CinemaComplexService from "../services/CinemaComplexService.js";
 import * as ShowtimeService from "../services/ShowtimeService.js";
+import * as SeatService from "../services/SeatService.js";
 import {
     buildShowtimeTreeByMovie,
     mapCinemaSystem,
@@ -8,6 +10,7 @@ import {
 } from "../utils/catalogMapper.js";
 import { parseNumber } from "../utils/catalogParsers.js";
 import { sendError, sendSuccess } from "../utils/httpResponse.js";
+import { syncSeatsForRoom } from "../utils/seedSeatsData.js";
 import mongoose from "mongoose";
 
 export const LayDanhSachRap = async (req, res) => {
@@ -72,11 +75,19 @@ export const ThemRap = async (req, res) => {
             return sendError(res, new Error("maCumRap is invalid"), 400);
         }
 
+        const complex = await CinemaComplexService.LayThongTinCumRap(maCumRap);
+
+        if (!complex) {
+            return sendError(res, new Error("Cum rap khong ton tai"), 400);
+        }
+
         const room = await RoomService.ThemRap({
             tenRap,
             maCumRap,
             soLuongGhe: parseNumber(soLuongGhe, 0),
         });
+
+        await syncSeatsForRoom(room);
 
         return sendSuccess(res, mapRoom(room), "Them rap thanh cong", 201);
     } catch (error) {
@@ -96,8 +107,16 @@ export const CapNhatRap = async (req, res) => {
             return sendError(res, new Error("maRap is invalid"), 400);
         }
 
-        if (maCumRap && !mongoose.Types.ObjectId.isValid(maCumRap)) {
-            return sendError(res, new Error("maCumRap is invalid"), 400);
+        if (maCumRap) {
+            if (!mongoose.Types.ObjectId.isValid(maCumRap)) {
+                return sendError(res, new Error("maCumRap is invalid"), 400);
+            }
+
+            const complex = await CinemaComplexService.LayThongTinCumRap(maCumRap);
+
+            if (!complex) {
+                return sendError(res, new Error("Cum rap khong ton tai"), 400);
+            }
         }
 
         const updatedRoom = await RoomService.CapNhatRap(maRap, {
@@ -111,6 +130,8 @@ export const CapNhatRap = async (req, res) => {
         if (!updatedRoom) {
             return sendError(res, new Error("Room not found"), 404);
         }
+
+        await syncSeatsForRoom(updatedRoom);
 
         return sendSuccess(res, mapRoom(updatedRoom), "Cap nhat rap thanh cong");
     } catch (error) {
@@ -130,11 +151,25 @@ export const XoaRap = async (req, res) => {
             return sendError(res, new Error("MaRap is invalid"), 400);
         }
 
+        const showtimes = await ShowtimeService.LayDanhSachLichChieu({
+            maRap: MaRap,
+        });
+
+        if (showtimes.length > 0) {
+            return sendError(
+                res,
+                new Error("Phong chieu dang co lich chieu, khong the xoa"),
+                400
+            );
+        }
+
         const deletedRoom = await RoomService.XoaRap(MaRap);
 
         if (!deletedRoom) {
             return sendError(res, new Error("Room not found"), 404);
         }
+
+        await SeatService.XoaGheTheoRap(MaRap);
 
         return sendSuccess(res, null, "Xoa rap thanh cong");
     } catch (error) {

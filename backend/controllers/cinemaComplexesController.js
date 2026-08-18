@@ -1,4 +1,6 @@
 import * as CinemaComplexService from "../services/CinemaComplexService.js";
+import * as CinemaSystemService from "../services/CinemaSystemService.js";
+import * as RoomService from "../services/RoomService.js";
 import { mapCinemaComplex } from "../utils/catalogMapper.js";
 import { sendError, sendSuccess } from "../utils/httpResponse.js";
 import mongoose from "mongoose";
@@ -70,6 +72,14 @@ export const ThemCumRap = async (req, res) => {
             return sendError(res, new Error("maHeThongRap is invalid"), 400);
         }
 
+        const system = await CinemaSystemService.LayThongTinHeThongRap(
+            maHeThongRap
+        );
+
+        if (!system) {
+            return sendError(res, new Error("He thong rap khong ton tai"), 400);
+        }
+
         const createdComplex = await CinemaComplexService.ThemCumRap({
             tenCumRap,
             diaChi,
@@ -101,8 +111,18 @@ export const CapNhatCumRap = async (req, res) => {
             return sendError(res, new Error("maCumRap is invalid"), 400);
         }
 
-        if (maHeThongRap && !mongoose.Types.ObjectId.isValid(maHeThongRap)) {
-            return sendError(res, new Error("maHeThongRap is invalid"), 400);
+        if (maHeThongRap) {
+            if (!mongoose.Types.ObjectId.isValid(maHeThongRap)) {
+                return sendError(res, new Error("maHeThongRap is invalid"), 400);
+            }
+
+            const system = await CinemaSystemService.LayThongTinHeThongRap(
+                maHeThongRap
+            );
+
+            if (!system) {
+                return sendError(res, new Error("He thong rap khong ton tai"), 400);
+            }
         }
 
         const updatedComplex = await CinemaComplexService.CapNhatCumRap(maCumRap, {
@@ -136,6 +156,16 @@ export const XoaCumRap = async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(MaCumRap)) {
             return sendError(res, new Error("MaCumRap is invalid"), 400);
+        }
+
+        const rooms = await RoomService.LayDanhSachRap({ maCumRap: MaCumRap });
+
+        if (rooms.length > 0) {
+            return sendError(
+                res,
+                new Error("Cum rap dang co phong chieu, khong the xoa"),
+                400
+            );
         }
 
         const deletedComplex = await CinemaComplexService.XoaCumRap(MaCumRap);

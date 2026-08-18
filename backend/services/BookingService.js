@@ -25,6 +25,13 @@ export const LayLichSuDatVeTheoTaiKhoan = async (taiKhoan) => {
 
 export const LayBookingTheoId = async (id) => Booking.findById(id);
 
+export const DemVeChuaHuyTheoLichChieu = async (maLichChieu) => {
+    return Booking.countDocuments({
+        maLichChieu,
+        trangThai: { $ne: "cancelled" },
+    });
+};
+
 export const HuyBooking = async (booking) => {
     booking.trangThai = "cancelled";
     await booking.save();

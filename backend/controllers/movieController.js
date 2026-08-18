@@ -1,4 +1,5 @@
 import * as MovieService from "../services/MovieService.js";
+import * as ShowtimeService from "../services/ShowtimeService.js";
 import { mapBannerFromMovie, mapMovie } from "../utils/catalogMapper.js";
 import {
     parseBoolean,
@@ -154,6 +155,18 @@ export const XoaPhim = async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(MaPhim)) {
             return sendError(res, new Error("MaPhim is invalid"), 400);
+        }
+
+        const showtimes = await ShowtimeService.LayDanhSachLichChieu({
+            maPhim: MaPhim,
+        });
+
+        if (showtimes.length > 0) {
+            return sendError(
+                res,
+                new Error("Phim dang co lich chieu, khong the xoa"),
+                400
+            );
         }
 
         const deletedMovie = await MovieService.XoaPhim(MaPhim);
