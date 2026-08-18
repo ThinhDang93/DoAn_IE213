@@ -27,3 +27,6 @@ dist-ssr
 
 # Backend local file uploads (migrated to Cloudinary)
 backend/uploads
+
+# Vercel CLI local artifacts
+.vercel
