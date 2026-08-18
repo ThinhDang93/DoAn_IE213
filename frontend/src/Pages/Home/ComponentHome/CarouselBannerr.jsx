@@ -29,38 +29,57 @@ const Banner = () => {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg  py-16">
-      {/* Wrapper */}
+    <div className="relative w-full overflow-hidden bg-black">
+      {/* Slider */}
       <div
-        className="flex transition-transform duration-500 ease-in-out"
+        className="flex transition-transform duration-700 ease-in-out"
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
-          width: `${query.data.length * 100}%`,
         }}
       >
         {query.data.map((item, index) => (
-          <div
-            key={item.maBanner}
-            className=" flex-shrink-0 w-full h-[40vh] md:h-[60vh] lg:h-[80vh] overflow-hidden "
-          >
+          <div key={item.maBanner} className="relative w-full flex-none">
             <img
               src={item.hinhAnh}
               alt={`banner-${index}`}
-              className="w-full h-full object-cover"
+              className="
+              block
+              w-full
+              h-auto
+              max-h-[80vh]
+              object-contain
+              object-center
+            "
             />
           </div>
         ))}
       </div>
 
       {/* Indicators */}
-      <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+      <div
+        className="
+        absolute
+        z-30
+        flex
+        -translate-x-1/2
+        bottom-4
+        left-1/2
+        gap-2
+      "
+      >
         {query.data.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full ${
-              index === currentIndex ? "bg-white" : "bg-gray-400"
-            }`}
+            aria-label={`Banner ${index + 1}`}
+            className={`
+            w-2.5
+            h-2.5
+            rounded-full
+            transition-all
+            duration-300
+            ${index === currentIndex ? "bg-white scale-110" : "bg-white/50"}
+          `}
           />
         ))}
       </div>
