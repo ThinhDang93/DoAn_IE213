@@ -1,6 +1,6 @@
 import * as MovieService from "../services/MovieService.js";
 import * as ShowtimeService from "../services/ShowtimeService.js";
-import { mapBannerFromMovie, mapMovie } from "../utils/catalogMapper.js";
+import { mapMovie } from "../utils/catalogMapper.js";
 import {
     parseBoolean,
     parseDateInput,
@@ -176,17 +176,6 @@ export const XoaPhim = async (req, res) => {
         }
 
         return sendSuccess(res, null, "Xoa phim thanh cong");
-    } catch (error) {
-        return sendError(res, error);
-    }
-};
-
-export const LayDanhSachBanner = async (req, res) => {
-    try {
-        const banners = await MovieService.LayDanhSachBanner(8);
-        const content = banners.map((movie) => mapBannerFromMovie(movie, req));
-
-        return sendSuccess(res, content, "Lay danh sach banner thanh cong");
     } catch (error) {
         return sendError(res, error);
     }

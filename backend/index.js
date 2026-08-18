@@ -4,6 +4,7 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
+import bannerRoutes from "./routes/banner.routes.js";
 import cinemaComplexRoutes from "./routes/cinemaComplex.routes.js";
 import cinemaSystemRoutes from "./routes/cinemaSystem.routes.js";
 import movieRoutes from "./routes/movie.routes.js";
@@ -52,6 +53,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/QuanLyPhim", movieRoutes);
+app.use("/api/QuanLyBanner", bannerRoutes);
 app.use("/api/QuanLyHeThongRap", cinemaSystemRoutes);
 app.use("/api/QuanLyCumRap", cinemaComplexRoutes);
 app.use("/api/QuanLyRap", roomRoutes);

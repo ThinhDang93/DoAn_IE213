@@ -17,6 +17,7 @@ import Ad_UserManagement from "./Pages/Admin/Ad_UserManagement";
 import Ad_CinemaManagement from "./Pages/Admin/Ad_CinemaManagement";
 import Ad_ShowtimeManagement from "./Pages/Admin/Ad_ShowtimeManagement";
 import Ad_BookingManagement from "./Pages/Admin/Ad_BookingManagement";
+import Ad_BannerManagement from "./Pages/Admin/Ad_BannerManagement";
 import AddNewFilm from "./Pages/Admin/AddNewFilm";
 import AddNewUser from "./Pages/Admin/AddNewUser";
 import AddNewShowtime from "./Pages/Admin/AddNewShowtime";
@@ -99,6 +100,11 @@ const App = () => {
             <Route
               path="admin/booking"
               element={adminOnly(<Ad_BookingManagement />)}
+            />
+
+            <Route
+              path="admin/banner"
+              element={adminOnly(<Ad_BannerManagement />)}
             />
           </Routes>
         </QueryClientProvider>

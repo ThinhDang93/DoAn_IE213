@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFilmBannerAPI } from "../../../API/filmBannerAPI";
+import { LayDanhSachBannerAPI } from "../../../API/BannerAPI";
 
 const Banner = () => {
   const query = useQuery({
-    queryKey: ["getFilmBanner"],
-    queryFn: getFilmBannerAPI,
+    queryKey: ["getBanner"],
+    queryFn: LayDanhSachBannerAPI,
     staleTime: 5000,
     gcTime: 100000,
   });
@@ -24,6 +24,8 @@ const Banner = () => {
     return <div>Loading....</div>;
   } else if (query.error) {
     return <div>Lỗi: {query.error.message}</div>;
+  } else if (!query.data || query.data.length === 0) {
+    return null;
   }
 
   return (
@@ -44,8 +46,7 @@ const Banner = () => {
             <img
               src={item.hinhAnh}
               alt={`banner-${index}`}
-              className="w-screen h-auto object-cover
-              "
+              className="w-full h-full object-cover"
             />
           </div>
         ))}

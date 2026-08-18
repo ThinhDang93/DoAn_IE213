@@ -304,6 +304,29 @@ const SlideBar_Admin = () => {
                   </span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to={"/admin/banner"}
+                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="shrink-0 w-5 h-5 text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H3Zm11.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM4 14l3.5-4.5 2.5 3L12.5 9 16 14H4Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>Banner</span>
+                  </span>
+                </NavLink>
+              </li>
             </div>
             <li>
               <NavLink

@@ -3,7 +3,6 @@ import { uploadMovie as upload } from "../middlewares/multer.js";
 import { verifyToken, checkAdmin } from "../middlewares/auth.middleware.js";
 import {
     CapNhatPhimUpload,
-    LayDanhSachBanner,
     LayDanhSachPhim,
     LayThongTinPhim,
     ThemPhimUploadHinh,
@@ -15,8 +14,6 @@ const router = express.Router();
 router.get("/LayDanhSachPhim", LayDanhSachPhim);
 
 router.get("/LayThongTinPhim", LayThongTinPhim);
-
-router.get("/LayDanhSachBanner", LayDanhSachBanner);
 
 router.post(
     "/ThemPhimUploadHinh",

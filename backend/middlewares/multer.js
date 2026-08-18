@@ -28,3 +28,4 @@ const createUploader = (folder) => {
 export const uploadMovie = createUploader("movies");
 export const uploadCinemaSystem = createUploader("cinema-systems");
 export const uploadCinemaComplex = createUploader("cinema-complexes");
+export const uploadBanner = createUploader("banners");

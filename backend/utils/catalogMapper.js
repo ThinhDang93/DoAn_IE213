@@ -59,12 +59,6 @@ export const mapMovie = (movie, req) => ({
     hinhAnh: toAbsoluteAssetUrl(req, movie.hinhAnh),
 });
 
-export const mapBannerFromMovie = (movie, req) => ({
-    maBanner: toIdString(movie._id),
-    maPhim: toIdString(movie._id),
-    hinhAnh: toAbsoluteAssetUrl(req, movie.hinhAnh),
-});
-
 export const mapCinemaSystem = (system, req) => ({
     maHeThongRap: toIdString(system._id || system.maHeThongRap),
     tenHeThongRap: system.tenHeThongRap || "",

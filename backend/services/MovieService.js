@@ -24,10 +24,3 @@ export const XoaPhim = async (maPhim) => {
     return Movie.findByIdAndDelete(maPhim).lean();
 };
 
-export const LayDanhSachBanner = async (limit = 8) => {
-    return Movie.find({ hinhAnh: { $ne: "" } })
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .lean();
-};
-
