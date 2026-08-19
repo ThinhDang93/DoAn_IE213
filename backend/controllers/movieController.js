@@ -66,6 +66,21 @@ const buildMoviePayload = (body, file) => {
     if (file) {
         payload.hinhAnh = file.path;
     }
+    if (body.theLoai !== undefined) {
+        payload.theLoai = String(body.theLoai).trim();
+    }
+    if (body.daoDien !== undefined) {
+        payload.daoDien = String(body.daoDien).trim();
+    }
+    if (body.dienVien !== undefined) {
+        payload.dienVien = String(body.dienVien).trim();
+    }
+    if (body.thoiLuong !== undefined) {
+        payload.thoiLuong = parseNumber(body.thoiLuong, 0);
+    }
+    if (body.doTuoi !== undefined) {
+        payload.doTuoi = String(body.doTuoi).trim();
+    }
 
     return payload;
 };

@@ -57,6 +57,11 @@ export const mapMovie = (movie, req) => ({
     hot: Boolean(movie.hot),
     danhGia: Number(movie.danhGia ?? 0),
     hinhAnh: toAbsoluteAssetUrl(req, movie.hinhAnh),
+    theLoai: movie.theLoai || "",
+    daoDien: movie.daoDien || "",
+    dienVien: movie.dienVien || "",
+    thoiLuong: Number(movie.thoiLuong ?? 0),
+    doTuoi: movie.doTuoi || "",
 });
 
 export const mapCinemaSystem = (system, req) => ({
