@@ -41,6 +41,28 @@ const movieSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        theLoai: {
+            type: String,
+            default: "",
+        },
+        daoDien: {
+            type: String,
+            default: "",
+        },
+        dienVien: {
+            type: String,
+            default: "",
+        },
+        thoiLuong: {
+            type: Number,
+            default: 0,
+        },
+        doTuoi: {
+            type: String,
+            default: "", 
+        },
+
+
     },
     {
         timestamps: true,
