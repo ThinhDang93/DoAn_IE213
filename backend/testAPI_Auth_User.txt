@@ -55,10 +55,21 @@ GET localhost:8080/api/QuanLyNguoiDung/ThongTinTaiKhoan
 PUT GET localhost:8080/api/QuanLyNguoiDung/ThongTinTaiKhoan
 Input: + auth Bearer token (accessToken)
 {
-  "hoTen": "Nguyen Van A Updated",
-  "email": "a_updated@gmail.com",
-  "soDT": "0909999999"
+  "hoTen": "Nguyen Van B",
+  "email": "b@gmail.com",
+  "soDT": "0909123456"
 }
+
+================================================================
+PUT localhost:8080/api/QuanLyNguoiDung/DoiMatKhau
+Input: auth Bearer token (accessToken)
+{
+  "matKhauCu": "123456",
+  "matKhauMoi": "654321",
+  "xacNhanMatKhau": "654321"
+}
+
+
 
 
 
