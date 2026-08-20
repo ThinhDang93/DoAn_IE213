@@ -26,6 +26,11 @@ const FormFilm = () => {
       hot: false,
       danhGia: 0,
       hinhAnh: null,
+      theLoai: "",
+      daoDien: "",
+      dienVien: "",
+      thoiLuong: 0,
+      doTuoi: "",
     },
     onSubmit: async (values) => {
       if (isEdit) {
@@ -118,6 +123,79 @@ const FormFilm = () => {
             onChange={frmFilm.handleChange}
             className="w-full border rounded-lg p-2"
           />
+        </div>
+
+        {/* Thể loại */}
+        <div>
+          <label className="block mb-1 font-medium">Thể loại</label>
+          <input
+            id="theLoai"
+            type="text"
+            name="theLoai"
+            value={frmFilm.values.theLoai}
+            onChange={frmFilm.handleChange}
+            placeholder="Vd: Hành động, Viễn tưởng"
+            className="w-full border rounded-lg p-2"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Nhiều thể loại cách nhau bằng dấu phẩy.
+          </p>
+        </div>
+
+        {/* Đạo diễn */}
+        <div>
+          <label className="block mb-1 font-medium">Đạo diễn</label>
+          <input
+            id="daoDien"
+            type="text"
+            name="daoDien"
+            value={frmFilm.values.daoDien}
+            onChange={frmFilm.handleChange}
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Diễn viên */}
+        <div>
+          <label className="block mb-1 font-medium">Diễn viên</label>
+          <input
+            id="dienVien"
+            type="text"
+            name="dienVien"
+            value={frmFilm.values.dienVien}
+            onChange={frmFilm.handleChange}
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Thời lượng + Độ tuổi */}
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="block mb-1 font-medium">
+              Thời lượng (phút)
+            </label>
+            <input
+              id="thoiLuong"
+              type="number"
+              name="thoiLuong"
+              min="0"
+              value={frmFilm.values.thoiLuong}
+              onChange={frmFilm.handleChange}
+              className="w-full border rounded-lg p-2"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block mb-1 font-medium">Độ tuổi</label>
+            <input
+              id="doTuoi"
+              type="text"
+              name="doTuoi"
+              value={frmFilm.values.doTuoi}
+              onChange={frmFilm.handleChange}
+              placeholder="Vd: T13, T18"
+              className="w-full border rounded-lg p-2"
+            />
+          </div>
         </div>
 
         {/* Checkbox */}

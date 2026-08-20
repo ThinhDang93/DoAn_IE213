@@ -2,3 +2,13 @@
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
+
+/*
+ * Du an chua co nut bat/tat dark mode, va khong phai component nao cung
+ * khai bao du class dark: nen truoc day dark mode tu bat theo he dieu
+ * hanh (media query mac dinh cua Tailwind) gay loi chu trung mau nen o
+ * nhung trang thieu class dark:. Doi dark: sang class-based va khong bao
+ * gio gan class "dark" o dau ca -> dark: khong bao gio kich hoat, toan bo
+ * site luon hien thi 1 theme sang duy nhat.
+ */
+@custom-variant dark (&:where(.dark, .dark *));

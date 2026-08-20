@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import { getAllFilmAPIActionThunk } from "../../../redux/reducers/FilmReducer";
+import { getTheLoaiTags, normalizeText } from "../../../utils/filmFilter";
 
 const FilmCard = () => {
-  const { arrFilm } = useSelector((state) => state.FilmReducer);
+  const { arrFilm, filters } = useSelector((state) => state.FilmReducer);
+  const [searchParams] = useSearchParams();
+  const searchKeyword = searchParams.get("q") || "";
 
   const dispatch = useDispatch();
 
@@ -17,10 +20,38 @@ const FilmCard = () => {
     getAllFilm();
   }, []);
 
+  const filteredFilms = useMemo(() => {
+    const keyword = normalizeText(searchKeyword.trim());
+
+    return (arrFilm || []).filter((item) => {
+      if (keyword && !normalizeText(item.tenPhim).includes(keyword)) {
+        return false;
+      }
+
+      if (filters.theLoai && !getTheLoaiTags(item.theLoai).includes(filters.theLoai)) {
+        return false;
+      }
+
+      if (filters.trangThai === "hot" && !item.hot) return false;
+      if (filters.trangThai === "dangChieu" && !item.dangChieu) return false;
+      if (filters.trangThai === "sapChieu" && !item.sapChieu) return false;
+
+      return true;
+    });
+  }, [arrFilm, filters, searchKeyword]);
+
   return (
     <div>
+      {searchKeyword && (
+        <p className="container mx-auto px-4 mb-3 text-gray-600">
+          Kết quả tìm kiếm cho "{searchKeyword}": {filteredFilms.length} phim
+        </p>
+      )}
       <div className="flex flex-wrap justify-center gap-6 container mx-auto px-4">
-        {arrFilm?.map((item) => (
+        {filteredFilms.length === 0 && (
+          <p className="text-gray-500 py-10">Không tìm thấy phim phù hợp.</p>
+        )}
+        {filteredFilms.map((item) => (
           <div
             key={item.maPhim}
             className="w-64 bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition"

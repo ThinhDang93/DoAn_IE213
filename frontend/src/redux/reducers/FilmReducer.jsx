@@ -5,6 +5,10 @@ const initialState = {
   arrFilm: [],
   filmDetail: {},
   filmEdit: {},
+  filters: {
+    theLoai: "",
+    trangThai: "all", // "all" | "hot" | "dangChieu" | "sapChieu"
+  },
 };
 
 const FilmReducer = createSlice({
@@ -20,11 +24,22 @@ const FilmReducer = createSlice({
     setFilmEditAction: (state, action) => {
       state.filmEdit = action.payload;
     },
+    setTheLoaiFilter: (state, action) => {
+      state.filters.theLoai = action.payload;
+    },
+    setTrangThaiFilter: (state, action) => {
+      state.filters.trangThai = action.payload;
+    },
   },
 });
 
-export const { setFilmAction, setFilmDetaiAction, setFilmEditAction } =
-  FilmReducer.actions;
+export const {
+  setFilmAction,
+  setFilmDetaiAction,
+  setFilmEditAction,
+  setTheLoaiFilter,
+  setTrangThaiFilter,
+} = FilmReducer.actions;
 
 export default FilmReducer.reducer;
 
