@@ -62,6 +62,7 @@ export const mapMovie = (movie, req) => ({
     dienVien: movie.dienVien || "",
     thoiLuong: Number(movie.thoiLuong ?? 0),
     doTuoi: movie.doTuoi || "",
+    dinhDang: movie.dinhDang || "",
 });
 
 export const mapCinemaSystem = (system, req) => ({
@@ -102,7 +103,7 @@ export const mapShowtime = (showtime) => ({
     giaVe: Number(showtime.giaVe ?? 0),
 });
 
-export const buildShowtimeTreeByMovie = (showtimes, req) => {
+export const buildShowtimeTreeByMovie = (showtimes, req, seatPriceByRoom = new Map()) => {
     const groupedSystems = new Map();
 
     for (const showtime of showtimes) {
@@ -138,13 +139,19 @@ export const buildShowtimeTreeByMovie = (showtimes, req) => {
             });
         }
 
+        const roomId = toIdString(room._id || room);
+        const seatPrice = seatPriceByRoom.get(roomId);
+        const giaVeMacDinh = Number(showtime.giaVe ?? 0);
+
         const currentComplex = currentSystem._cumRapMap.get(complexId);
         currentComplex.lichChieuPhim.push({
             maLichChieu: toIdString(showtime._id || showtime.maLichChieu),
-            maRap: toIdString(room._id || room),
+            maRap: roomId,
             tenRap: room.tenRap || "",
             ngayChieuGioChieu: toIsoString(showtime.ngayChieuGioChieu),
-            giaVe: Number(showtime.giaVe ?? 0),
+            giaVe: giaVeMacDinh,
+            giaVeMin: seatPrice ? Number(seatPrice.giaVeMin) : giaVeMacDinh,
+            giaVeMax: seatPrice ? Number(seatPrice.giaVeMax) : giaVeMacDinh,
         });
     }
 

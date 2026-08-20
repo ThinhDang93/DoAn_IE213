@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getFilmDetailbyIDActionThunk } from "../../../redux/reducers/FilmReducer";
+import { getYoutubeEmbedUrl } from "../../../utils/youtube";
 
 const FilmInfo = () => {
   const param = useParams();
   const { filmDetail } = useSelector((state) => state.FilmReducer);
   const dispatch = useDispatch();
+  const [showTrailer, setShowTrailer] = useState(false);
 
   const getFilmbyID = async () => {
     const actionThunk = getFilmDetailbyIDActionThunk(param.maPhim);
@@ -16,6 +18,8 @@ const FilmInfo = () => {
   useEffect(() => {
     getFilmbyID();
   }, [param.maPhim]);
+
+  const trailerEmbedUrl = getYoutubeEmbedUrl(filmDetail.trailer);
 
   return (
     <div className="max-w-6xl mx-auto p-6 pt-18">
@@ -73,25 +77,91 @@ const FilmInfo = () => {
                   ⭐ {filmDetail.danhGia}/10
                 </span>
               </p>
+              {filmDetail.theLoai && (
+                <p>
+                  <span className="font-semibold">Thể loại:</span>{" "}
+                  {filmDetail.theLoai}
+                </p>
+              )}
+              {filmDetail.daoDien && (
+                <p>
+                  <span className="font-semibold">Đạo diễn:</span>{" "}
+                  {filmDetail.daoDien}
+                </p>
+              )}
+              {filmDetail.dienVien && (
+                <p>
+                  <span className="font-semibold">Diễn viên:</span>{" "}
+                  {filmDetail.dienVien}
+                </p>
+              )}
+              {filmDetail.dinhDang && (
+                <p>
+                  <span className="font-semibold">Định dạng:</span>{" "}
+                  {filmDetail.dinhDang}
+                </p>
+              )}
+              {!!filmDetail.thoiLuong && (
+                <p>
+                  <span className="font-semibold">Thời lượng:</span>{" "}
+                  {filmDetail.thoiLuong} phút
+                </p>
+              )}
+              {filmDetail.doTuoi && (
+                <p>
+                  <span className="font-semibold">Độ tuổi:</span>{" "}
+                  {filmDetail.doTuoi}
+                </p>
+              )}
             </div>
           </div>
 
           {/* Nút trailer luôn nằm cuối */}
           <div className="mt-6">
-            <NavLink
-              to={filmDetail.trailer}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 
-              hover:from-green-500 hover:to-green-700 
-              focus:ring-4 focus:outline-none focus:ring-green-300 
-              font-medium rounded-lg text-base px-6 py-3 text-center shadow-md"
+            <button
+              type="button"
+              onClick={() => setShowTrailer(true)}
+              disabled={!trailerEmbedUrl}
+              className="inline-block text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600
+              hover:from-green-500 hover:to-green-700
+              focus:ring-4 focus:outline-none focus:ring-green-300
+              font-medium rounded-lg text-base px-6 py-3 text-center shadow-md
+              disabled:opacity-50 disabled:cursor-not-allowed"
             >
               🎬 Xem trailer
-            </NavLink>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Popup trailer YouTube */}
+      {showTrailer && trailerEmbedUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setShowTrailer(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowTrailer(false)}
+              aria-label="Đóng"
+              className="absolute -top-10 right-0 text-white text-3xl leading-none hover:text-gray-300"
+            >
+              &times;
+            </button>
+            <iframe
+              className="w-full h-full rounded-lg"
+              src={trailerEmbedUrl}
+              title="Trailer"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

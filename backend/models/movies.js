@@ -59,10 +59,12 @@ const movieSchema = new mongoose.Schema(
         },
         doTuoi: {
             type: String,
-            default: "", 
+            default: "",
         },
-
-
+        dinhDang: {
+            type: String,
+            default: "",
+        },
     },
     {
         timestamps: true,

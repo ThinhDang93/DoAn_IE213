@@ -31,6 +31,7 @@ const FormFilm = () => {
       dienVien: "",
       thoiLuong: 0,
       doTuoi: "",
+      dinhDang: "",
     },
     onSubmit: async (values) => {
       if (isEdit) {
@@ -193,6 +194,18 @@ const FormFilm = () => {
               value={frmFilm.values.doTuoi}
               onChange={frmFilm.handleChange}
               placeholder="Vd: T13, T18"
+              className="w-full border rounded-lg p-2"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block mb-1 font-medium">Định dạng</label>
+            <input
+              id="dinhDang"
+              type="text"
+              name="dinhDang"
+              value={frmFilm.values.dinhDang}
+              onChange={frmFilm.handleChange}
+              placeholder="Vd: 2D, 3D, IMAX"
               className="w-full border rounded-lg p-2"
             />
           </div>

@@ -2,6 +2,7 @@ import * as ShowtimeService from "../services/ShowtimeService.js";
 import * as MovieService from "../services/MovieService.js";
 import * as RoomService from "../services/RoomService.js";
 import * as BookingService from "../services/BookingService.js";
+import * as SeatService from "../services/SeatService.js";
 import {
     buildShowtimeTreeByMovie,
     mapShowtime,
@@ -244,7 +245,11 @@ export const LayThongTinLichChieuPhim = async (req, res) => {
         }
 
         const showtimes = await ShowtimeService.LayThongTinLichChieuPhim(MaPhim);
-        const content = buildShowtimeTreeByMovie(showtimes, req);
+        const roomIds = showtimes
+            .map((s) => s.maRap?._id || s.maRap)
+            .filter(Boolean);
+        const seatPriceByRoom = await SeatService.LayGiaVeMinMaxTheoRap(roomIds);
+        const content = buildShowtimeTreeByMovie(showtimes, req, seatPriceByRoom);
 
         return sendSuccess(res, content, "Lay thong tin lich chieu phim thanh cong");
     } catch (error) {

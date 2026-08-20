@@ -201,7 +201,11 @@ export const LayThongTinLichChieuPhim = async (req, res) => {
         }
 
         const showtimes = await ShowtimeService.LayThongTinLichChieuPhim(MaPhim);
-        const content = buildShowtimeTreeByMovie(showtimes, req);
+        const roomIds = showtimes
+            .map((s) => s.maRap?._id || s.maRap)
+            .filter(Boolean);
+        const seatPriceByRoom = await SeatService.LayGiaVeMinMaxTheoRap(roomIds);
+        const content = buildShowtimeTreeByMovie(showtimes, req, seatPriceByRoom);
 
         return sendSuccess(res, content, "Lay thong tin lich chieu phim thanh cong");
     } catch (error) {

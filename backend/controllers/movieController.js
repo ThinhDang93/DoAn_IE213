@@ -81,6 +81,9 @@ const buildMoviePayload = (body, file) => {
     if (body.doTuoi !== undefined) {
         payload.doTuoi = String(body.doTuoi).trim();
     }
+    if (body.dinhDang !== undefined) {
+        payload.dinhDang = String(body.dinhDang).trim();
+    }
 
     return payload;
 };
