@@ -7,18 +7,14 @@ import {
 import { getTheLoaiTags } from "../../../utils/filmFilter";
 
 const TRANG_THAI_OPTIONS = [
-  { value: "all", label: "Tất cả" },
+  { value: "all", label: "Trạng thái chiếu" },
   { value: "hot", label: "Hot" },
   { value: "dangChieu", label: "Đang chiếu" },
   { value: "sapChieu", label: "Sắp chiếu" },
 ];
 
-const chipClass = (active) =>
-  `px-3 py-1.5 rounded-full text-sm font-medium border transition ${
-    active
-      ? "bg-blue-600 text-white border-blue-600"
-      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-  }`;
+const selectClass =
+  "pl-4 pr-4 py-2 min-w-[180px] rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer";
 
 const FilmFilter = () => {
   const dispatch = useDispatch();
@@ -37,41 +33,33 @@ const FilmFilter = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        {TRANG_THAI_OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => dispatch(setTrangThaiFilter(opt.value))}
-            className={chipClass(filters.trangThai === opt.value)}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
-      {theLoaiList.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => dispatch(setTheLoaiFilter(""))}
-            className={chipClass(filters.theLoai === "")}
-          >
-            Tất cả thể loại
-          </button>
+    <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <select
+          value={filters.theLoai}
+          onChange={(e) => dispatch(setTheLoaiFilter(e.target.value))}
+          className={selectClass}
+        >
+          <option value="">Chọn thể loại phim</option>
           {theLoaiList.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => dispatch(setTheLoaiFilter(tag))}
-              className={chipClass(filters.theLoai === tag)}
-            >
+            <option key={tag} value={tag}>
               {tag}
-            </button>
+            </option>
           ))}
-        </div>
-      )}
+        </select>
+
+        <select
+          value={filters.trangThai}
+          onChange={(e) => dispatch(setTrangThaiFilter(e.target.value))}
+          className={selectClass}
+        >
+          {TRANG_THAI_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 };

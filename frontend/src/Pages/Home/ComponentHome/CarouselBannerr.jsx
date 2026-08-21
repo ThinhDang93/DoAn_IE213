@@ -29,7 +29,7 @@ const Banner = () => {
   }
 
   return (
-    <div className="relative w-full overflow-hidden bg-black">
+    <div className="relative w-full overflow-hidden pt-12">
       {/* Slider */}
       <div
         className="flex transition-transform duration-700 ease-in-out"

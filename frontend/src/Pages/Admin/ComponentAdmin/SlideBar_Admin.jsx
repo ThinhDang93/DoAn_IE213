@@ -169,7 +169,7 @@ const SlideBar_Admin = () => {
                   <li>
                     <NavLink
                       to={"/admin/user/addnew"}
-                      className="block p-2 rounded text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block p-2 rounded text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Add New
                     </NavLink>
@@ -177,7 +177,7 @@ const SlideBar_Admin = () => {
                   <li>
                     <NavLink
                       to={"/admin/user"}
-                      className="block p-2 rounded text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block p-2 rounded text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       User Infomation
                     </NavLink>
@@ -228,7 +228,7 @@ const SlideBar_Admin = () => {
                   <li>
                     <NavLink
                       to={"/admin/film/addnew"}
-                      className="block p-2 rounded text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block p-2 rounded text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Add New
                     </NavLink>
@@ -236,7 +236,7 @@ const SlideBar_Admin = () => {
                   <li>
                     <NavLink
                       to={"/admin/film"}
-                      className="block p-2 rounded text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block p-2 rounded text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Film Infomation
                     </NavLink>

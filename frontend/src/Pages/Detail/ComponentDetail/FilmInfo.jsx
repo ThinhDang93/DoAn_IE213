@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { getFilmDetailbyIDActionThunk } from "../../../redux/reducers/FilmReducer";
 import { getYoutubeEmbedUrl } from "../../../utils/youtube";
 import { formatVietnamDate } from "../../../utils/vietnamTime";
+import { getFormatBadges } from "../../../utils/formatBadges";
 
 const FilmInfo = () => {
   const param = useParams();
@@ -21,6 +22,7 @@ const FilmInfo = () => {
   }, [param.maPhim]);
 
   const trailerEmbedUrl = getYoutubeEmbedUrl(filmDetail.trailer);
+  const formatBadges = getFormatBadges(filmDetail.dinhDang);
 
   return (
     <div className="max-w-6xl mx-auto p-6 pt-18">
@@ -43,31 +45,31 @@ const FilmInfo = () => {
             <h1 className="text-4xl font-bold">{filmDetail.tenPhim}</h1>
 
             {/* Mô tả */}
-            <p className="text-gray-700 leading-relaxed line-clamp-6">
+            <p className="text-gray-700 leading-relaxed line-clamp-6 text-lg">
               {filmDetail.moTa}
             </p>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-3">
               {filmDetail.hot && (
-                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-base font-medium">
                   Hot
                 </span>
               )}
               {filmDetail.dangChieu && (
-                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-base font-medium">
                   Đang chiếu
                 </span>
               )}
               {filmDetail.sapChieu && (
-                <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-medium">
+                <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-base font-medium">
                   Sắp chiếu
                 </span>
               )}
             </div>
 
             {/* Extra Info */}
-            <div className="space-y-2 text-gray-800">
+            <div className="space-y-2 text-gray-800 text-lg">
               <p>
                 <span className="font-semibold">Ngày khởi chiếu:</span>{" "}
                 {formatVietnamDate(filmDetail.ngayKhoiChieu)}
@@ -96,10 +98,18 @@ const FilmInfo = () => {
                   {filmDetail.dienVien}
                 </p>
               )}
-              {filmDetail.dinhDang && (
-                <p>
-                  <span className="font-semibold">Định dạng:</span>{" "}
-                  {filmDetail.dinhDang}
+              {formatBadges.length > 0 && (
+                <p className="flex items-center flex-wrap gap-2">
+                  <span className="font-semibold">Định dạng:</span>
+                  {formatBadges.map((badge) => (
+                    <img
+                      key={badge.label}
+                      src={badge.src}
+                      alt={badge.label}
+                      title={badge.label}
+                      className="h-6"
+                    />
+                  ))}
                 </p>
               )}
               {!!filmDetail.thoiLuong && (

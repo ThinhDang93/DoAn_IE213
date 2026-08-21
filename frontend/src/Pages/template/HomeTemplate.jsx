@@ -7,7 +7,7 @@ const HomeTemplate = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="container mx-auto">
+      <div className="container mx-auto ">
         <Outlet />
       </div>
       <Footer />
