@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import { getAllShowTimebyIDActionThunk } from "../../../redux/reducers/CinemaSystemReducer";
 import { useParams } from "react-router-dom";
@@ -146,7 +147,7 @@ const ComplexShowtimes = ({ rap, dispatch }) => {
                   {timeStr}
                 </span>
                 <span className="text-sm leading-tight">{giaLabel}</span>
-                <span>{lich.}</span>
+                <span className="text-xs leading-tight">{lich.tenRap}</span>
               </button>
             </NavLink>
           );
