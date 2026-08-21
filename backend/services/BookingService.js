@@ -11,6 +11,8 @@ const HISTORY_POPULATE = {
     ],
 };
 
+const SEAT_POPULATE = { path: "danhSachGhe.maGhe" };
+
 export const TaoBooking = async (data) => {
     const created = await Booking.create(data);
     return created.toObject();
@@ -20,6 +22,7 @@ export const LayLichSuDatVeTheoTaiKhoan = async (taiKhoan) => {
     return Booking.find({ taiKhoan })
         .sort({ createdAt: -1 })
         .populate(HISTORY_POPULATE)
+        .populate(SEAT_POPULATE)
         .lean();
 };
 
@@ -43,6 +46,7 @@ export const LayDanhSachVeDaBan = async (filter = {}) => {
         .sort({ createdAt: -1 })
         .populate({ path: "taiKhoan", select: "taiKhoan hoTen email" })
         .populate(HISTORY_POPULATE)
+        .populate(SEAT_POPULATE)
         .lean();
 };
 

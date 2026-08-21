@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getFilmDetailbyIDActionThunk } from "../../../redux/reducers/FilmReducer";
 import { getYoutubeEmbedUrl } from "../../../utils/youtube";
+import { formatVietnamDate } from "../../../utils/vietnamTime";
 
 const FilmInfo = () => {
   const param = useParams();
@@ -69,7 +70,7 @@ const FilmInfo = () => {
             <div className="space-y-2 text-gray-800">
               <p>
                 <span className="font-semibold">Ngày khởi chiếu:</span>{" "}
-                {new Date(filmDetail.ngayKhoiChieu).toLocaleDateString("vi-VN")}
+                {formatVietnamDate(filmDetail.ngayKhoiChieu)}
               </p>
               <p>
                 <span className="font-semibold">Đánh giá:</span>{" "}

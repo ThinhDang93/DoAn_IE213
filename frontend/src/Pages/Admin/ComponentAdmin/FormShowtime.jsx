@@ -8,6 +8,7 @@ import {
   LayThongTinLichChieuAPI,
   ThemLichChieuAPI,
 } from "../../../API/ShowtimeAPI";
+import { toVietnamDatetimeLocalValue } from "../../../utils/vietnamTime";
 
 const FormShowtime = () => {
   const match = useMatch("/admin/showtime/update/:maLichChieu");
@@ -60,7 +61,7 @@ const FormShowtime = () => {
     frmShowtime.setValues({
       maPhim: data.maPhim,
       maRap: data.maRap,
-      ngayChieuGioChieu: data.ngayChieuGioChieu?.slice(0, 16) || "",
+      ngayChieuGioChieu: toVietnamDatetimeLocalValue(data.ngayChieuGioChieu),
       giaVe: data.giaVe,
     });
   };

@@ -4,6 +4,7 @@ import {
   LayDanhSachLichChieuAPI,
   XoaLichChieuAPI,
 } from "../../../API/ShowtimeAPI";
+import { formatVietnamDateTime } from "../../../utils/vietnamTime";
 
 const ShowtimeManager = () => {
   const [showtimes, setShowtimes] = useState([]);
@@ -59,7 +60,7 @@ const ShowtimeManager = () => {
                 <td className="px-4 py-3">{s.tenRap}</td>
                 <td className="px-4 py-3">{s.tenCumRap}</td>
                 <td className="px-4 py-3">
-                  {new Date(s.ngayChieuGioChieu).toLocaleString("vi-VN")}
+                  {formatVietnamDateTime(s.ngayChieuGioChieu)}
                 </td>
                 <td className="px-4 py-3">{s.giaVe.toLocaleString()} VND</td>
                 <td className="px-4 py-3">

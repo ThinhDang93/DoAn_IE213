@@ -1,17 +1,27 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import utc from "dayjs/plugin/utc.js";
+import { VIETNAM_UTC_OFFSET_HOURS } from "./vietnamTime.js";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
-const DATE_FORMATS = [
+// Cac dinh dang KHONG kem thong tin timezone (nguoi dung/FE nhap gio theo
+// dong ho Viet Nam) - phai +/- lech gio VN khi doi qua lai UTC de luu DB,
+// khong duoc de dayjs tu doan theo timezone cua server dang chay (Render
+// mac dinh la UTC, khac VN 7 tieng, gay lech gio hien thi).
+const NAIVE_LOCAL_FORMATS = [
     "DD/MM/YYYY",
     "DD/MM/YYYY HH:mm",
     "YYYY-MM-DD",
     "YYYY-MM-DD HH:mm",
     "YYYY-MM-DDTHH:mm",
     "YYYY-MM-DDTHH:mm:ss",
-    "YYYY-MM-DDTHH:mm:ss.SSS[Z]",
 ];
+
+// Dinh dang co "Z" - da la UTC tuong minh (vd tu Date.toISOString()),
+// khong duoc cong/tru lech gio nua.
+const UTC_TAGGED_FORMATS = ["YYYY-MM-DDTHH:mm:ss.SSS[Z]"];
 
 export const parseBoolean = (value, fallback = false) => {
     if (typeof value === "boolean") {
@@ -53,8 +63,15 @@ export const parseDateInput = (value) => {
 
     const text = String(value).trim();
 
-    for (const format of DATE_FORMATS) {
-        const parsed = dayjs(text, format, true);
+    for (const format of NAIVE_LOCAL_FORMATS) {
+        const parsed = dayjs.utc(text, format, true);
+        if (parsed.isValid()) {
+            return parsed.subtract(VIETNAM_UTC_OFFSET_HOURS, "hour").toDate();
+        }
+    }
+
+    for (const format of UTC_TAGGED_FORMATS) {
+        const parsed = dayjs.utc(text, format, true);
         if (parsed.isValid()) {
             return parsed.toDate();
         }

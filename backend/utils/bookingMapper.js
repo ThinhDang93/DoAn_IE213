@@ -1,8 +1,17 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
 import { toAbsoluteAssetUrl, toIdString, toIsoString } from "./catalogMapper.js";
+import { VIETNAM_UTC_OFFSET_HOURS } from "./vietnamTime.js";
+
+dayjs.extend(utc);
 
 export const mapPhongVe = (showtime, seats, bookedIds) => {
-    const showDate = dayjs(showtime.ngayChieuGioChieu);
+    // showtime.ngayChieuGioChieu luu la UTC that trong DB; +7h de FORMAT
+    // ra dung gio Viet Nam, khong dung dayjs(...) tho vi no se format
+    // theo timezone cua server dang chay (Render la UTC, gay lech gio).
+    const showDate = dayjs
+        .utc(showtime.ngayChieuGioChieu)
+        .add(VIETNAM_UTC_OFFSET_HOURS, "hour");
     const room = showtime.maRap;
     const complex = room?.maCumRap;
 
@@ -44,7 +53,8 @@ export const mapBookingHistory = (booking, req) => {
         trangThai: booking.trangThai,
         tongTien: Number(booking.tongTien ?? 0),
         danhSachGhe: (booking.danhSachGhe || []).map((ghe) => ({
-            maGhe: toIdString(ghe.maGhe),
+            maGhe: toIdString(ghe.maGhe?._id || ghe.maGhe),
+            tenGhe: ghe.maGhe?.tenGhe || "",
             giaVe: Number(ghe.giaVe ?? 0),
         })),
         thongTinPhim: {

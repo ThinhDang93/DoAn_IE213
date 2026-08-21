@@ -3,6 +3,7 @@ import {
   LayDanhSachVeDaBanAPI,
   ThongKeDoanhThuAPI,
 } from "../../../API/BookingAPI";
+import { formatVietnamDateTime } from "../../../utils/vietnamTime";
 
 const TRANG_THAI_LABEL = {
   pending: "Chờ xử lý",
@@ -96,7 +97,7 @@ const BookingManager = () => {
               <th className="px-4 py-3">Khách hàng</th>
               <th className="px-4 py-3">Phim</th>
               <th className="px-4 py-3">Ngày đặt</th>
-              <th className="px-4 py-3">Số ghế</th>
+              <th className="px-4 py-3">Ghế</th>
               <th className="px-4 py-3">Tổng tiền</th>
               <th className="px-4 py-3">Trạng thái</th>
             </tr>
@@ -110,9 +111,11 @@ const BookingManager = () => {
                 </td>
                 <td className="px-4 py-3">{b.thongTinPhim.tenPhim}</td>
                 <td className="px-4 py-3">
-                  {new Date(b.ngayDat).toLocaleString("vi-VN")}
+                  {formatVietnamDateTime(b.ngayDat)}
                 </td>
-                <td className="px-4 py-3">{b.danhSachGhe.length}</td>
+                <td className="px-4 py-3">
+                  {b.danhSachGhe.map((g) => g.tenGhe).join(", ")}
+                </td>
                 <td className="px-4 py-3">{b.tongTien.toLocaleString()} VND</td>
                 <td className="px-4 py-3">
                   <span className={TRANG_THAI_CLASS[b.trangThai] || ""}>

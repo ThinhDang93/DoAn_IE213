@@ -4,6 +4,7 @@ import { getAllShowTimebyIDActionThunk } from "../../../redux/reducers/CinemaSys
 import { useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { getAllBookingDatabyIDActionThunk } from "../../../redux/reducers/BookingReducer";
+import { formatVietnamDate, formatVietnamTime } from "../../../utils/vietnamTime";
 
 const formatGia = (value) => `${Math.round(value / 1000)}k`;
 
@@ -12,8 +13,7 @@ const ComplexShowtimes = ({ rap, dispatch }) => {
     const map = new Map();
 
     rap.lichChieuPhim.forEach((lich) => {
-      const date = new Date(lich.ngayChieuGioChieu);
-      const key = date.toLocaleDateString("vi-VN");
+      const key = formatVietnamDate(lich.ngayChieuGioChieu);
 
       if (!map.has(key)) {
         map.set(key, []);
@@ -75,11 +75,7 @@ const ComplexShowtimes = ({ rap, dispatch }) => {
       {/* Giờ chiếu theo ngày đã chọn */}
       <div className="flex flex-wrap gap-2">
         {timesForSelectedDate.map((lich) => {
-          const date = new Date(lich.ngayChieuGioChieu);
-          const timeStr = date.toLocaleTimeString("vi-VN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+          const timeStr = formatVietnamTime(lich.ngayChieuGioChieu);
           const giaLabel =
             lich.giaVeMin && lich.giaVeMax && lich.giaVeMin !== lich.giaVeMax
               ? `${formatGia(lich.giaVeMin)} ~ ${formatGia(lich.giaVeMax)}`

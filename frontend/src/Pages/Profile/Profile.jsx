@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HuyVeAPI, LayLichSuDatVeAPI } from "../../API/BookingAPI";
+import { formatVietnamDateTime } from "../../utils/vietnamTime";
+import UpdateProfileForm from "./UpdateProfileForm";
 
 const TRANG_THAI_LABEL = {
   pending: "Chờ xử lý",
@@ -17,6 +19,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   const loadBookings = async () => {
     const data = await LayLichSuDatVeAPI();
@@ -63,7 +66,22 @@ const Profile = () => {
             <p>
               <b>Số điện thoại:</b> {user.soDT}
             </p>
+            <button
+              type="button"
+              onClick={() => setShowUpdateForm(true)}
+              className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none"
+            >
+              Cập nhật thông tin cá nhân
+            </button>
           </div>
+        )}
+
+        {showUpdateForm && (
+          <UpdateProfileForm
+            user={user}
+            onClose={() => setShowUpdateForm(false)}
+            onUpdated={(updatedUser) => setUser(updatedUser)}
+          />
         )}
 
         <h3 className="text-xl font-semibold mb-3">Lịch sử đặt vé</h3>
@@ -85,11 +103,11 @@ const Profile = () => {
                     </p>
                     <p className="text-sm text-gray-600">
                       Suất chiếu:{" "}
-                      {new Date(b.thongTinPhim.ngayChieuGioChieu).toLocaleString(
-                        "vi-VN"
-                      )}
+                      {formatVietnamDateTime(b.thongTinPhim.ngayChieuGioChieu)}
                     </p>
-                    <p className="text-sm">Số ghế: {b.danhSachGhe.length}</p>
+                    <p className="text-sm">
+                      Ghế: {b.danhSachGhe.map((g) => g.tenGhe).join(", ")}
+                    </p>
                     <p className="text-sm">
                       Tổng tiền: {b.tongTien.toLocaleString()} VND
                     </p>
