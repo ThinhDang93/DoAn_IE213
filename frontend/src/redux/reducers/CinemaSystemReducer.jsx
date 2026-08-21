@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import { http } from "../../utils/interceptor";
 
 const initialState = {
-  System: [],
   System_ShowTime: null,
   Selected_System: null,
   CinemaDetaibyFilm: [],
@@ -12,10 +11,6 @@ const CinemaSystemReducer = createSlice({
   name: "CinemaSystemReducer",
   initialState,
   reducers: {
-    setSystem: (state, action) => {
-      state.System = action.payload;
-    },
-
     setShowTime: (state, action) => {
       state.System_ShowTime = action.payload;
       if (action.payload.heThongRapChieu?.length > 0) {
@@ -36,18 +31,9 @@ const CinemaSystemReducer = createSlice({
   },
 });
 
-export const { setSystem, setShowTime, setSelectedSys } =
-  CinemaSystemReducer.actions;
+export const { setShowTime, setSelectedSys } = CinemaSystemReducer.actions;
 
 export default CinemaSystemReducer.reducer;
-
-export const getAllSystemActionThunk = () => {
-  return async (dispatch) => {
-    const res = await http.get("/api/QuanLyRap/LayThongTinHeThongRap");
-    const actionPayload = setSystem(res.data.content);
-    dispatch(actionPayload);
-  };
-};
 
 export const getAllShowTimebyIDActionThunk = (maPhim) => {
   return async (dispatch) => {

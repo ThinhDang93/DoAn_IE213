@@ -1,29 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAllSystemActionThunk,
-  setSelectedSys,
-} from "../../redux/reducers/CinemaSystemReducer";
+import { setSelectedSys } from "../../redux/reducers/CinemaSystemReducer";
 
 const AllSystem = () => {
-  const { System, Selected_System } = useSelector(
+  const { System_ShowTime, Selected_System } = useSelector(
     (state) => state.CinemaSystemReducer
   );
 
   const dispatch = useDispatch();
 
-  const getAllSystem = () => {
-    const actionThunk = getAllSystemActionThunk();
-    dispatch(actionThunk);
-  };
-
-  useEffect(() => {
-    getAllSystem();
-  }, [dispatch]);
+  // Chi hien thi he thong rap co lich chieu cho chinh bo phim dang xem
+  // (System_ShowTime.heThongRapChieu da duoc backend loc san theo MaPhim),
+  // khong dung danh sach tat ca he thong rap nua.
+  const systems = System_ShowTime?.heThongRapChieu || [];
 
   return (
     <div className="space-y-2 container">
-      {System?.map((item) => {
+      {systems.map((item) => {
         const isActive = item.maHeThongRap === Selected_System;
 
         return (
