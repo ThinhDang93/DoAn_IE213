@@ -15,7 +15,7 @@ const BookingInfo = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const { thongTinPhim, danhSachGhe, gheDangChon } = useSelector(
-    (state) => state.BookingReducer
+    (state) => state.BookingReducer,
   );
 
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ const BookingInfo = () => {
   }, [param.maLichChieu]);
 
   const gheDaChonInfo = danhSachGhe.filter((g) =>
-    gheDangChon.includes(g.maGhe)
+    gheDangChon.includes(g.maGhe),
   );
   const total = gheDaChonInfo.reduce((sum, g) => sum + g.giaVe, 0);
   const tenGheDaChon = gheDaChonInfo.map((g) => g.tenGhe).join(", ");
@@ -107,16 +107,16 @@ const BookingInfo = () => {
                             ghe.daDat
                               ? "bg-gray-500 cursor-not-allowed text-white"
                               : isSelected
-                              ? "bg-red-500 text-white"
-                              : ghe.loaiGhe === "Vip"
-                              ? "bg-yellow-400 hover:bg-yellow-500"
-                              : "bg-green-400 hover:bg-green-500"
+                                ? "bg-red-500 text-white"
+                                : ghe.loaiGhe === "Vip"
+                                  ? "bg-yellow-400 hover:bg-yellow-500"
+                                  : "bg-green-400 hover:bg-green-500"
                           }`}
                       >
                         {ghe.daDat ? "X" : ghe.tenGhe}
                       </button>
                     );
-                  }
+                  },
                 )}
               </div>
             </div>
@@ -154,7 +154,7 @@ const BookingInfo = () => {
             <b>Cụm rạp:</b> {thongTinPhim.tenCumRap}
           </p>
           <p>
-            <b>Rạp:</b> {thongTinPhim.tenRap}
+            <b>Phòng chiếu:</b> {thongTinPhim.tenRap}
           </p>
           <p>
             <b>Địa chỉ:</b> {thongTinPhim.diaChi}

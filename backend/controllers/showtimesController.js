@@ -126,6 +126,21 @@ export const ThemLichChieu = async (req, res) => {
             return sendError(res, new Error("Phong chieu khong ton tai"), 400);
         }
 
+        const trungGio = await ShowtimeService.TonTaiLichChieuTrungGio(
+            payload.maRap,
+            payload.ngayChieuGioChieu
+        );
+
+        if (trungGio) {
+            return sendError(
+                res,
+                new Error(
+                    "Phong chieu nay da co lich chieu khac vao dung ngay gio nay"
+                ),
+                409
+            );
+        }
+
         const createdShowtime = await ShowtimeService.ThemLichChieu(payload);
 
         return sendSuccess(
@@ -149,6 +164,14 @@ export const CapNhatLichChieu = async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(maLichChieu)) {
             return sendError(res, new Error("maLichChieu is invalid"), 400);
+        }
+
+        const existingShowtime = await ShowtimeService.LayThongTinLichChieu(
+            maLichChieu
+        );
+
+        if (!existingShowtime) {
+            return sendError(res, new Error("Showtime not found"), 404);
         }
 
         const payload = buildShowtimePayload(req.body);
@@ -175,6 +198,28 @@ export const CapNhatLichChieu = async (req, res) => {
             if (!room) {
                 return sendError(res, new Error("Phong chieu khong ton tai"), 400);
             }
+        }
+
+        const effectiveMaRap =
+            payload.maRap ||
+            String(existingShowtime.maRap?._id || existingShowtime.maRap);
+        const effectiveNgayChieu =
+            payload.ngayChieuGioChieu || existingShowtime.ngayChieuGioChieu;
+
+        const trungGio = await ShowtimeService.TonTaiLichChieuTrungGio(
+            effectiveMaRap,
+            effectiveNgayChieu,
+            maLichChieu
+        );
+
+        if (trungGio) {
+            return sendError(
+                res,
+                new Error(
+                    "Phong chieu nay da co lich chieu khac vao dung ngay gio nay"
+                ),
+                409
+            );
         }
 
         const updatedShowtime = await ShowtimeService.CapNhatLichChieu(

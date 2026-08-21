@@ -9,9 +9,6 @@ const AllSystem = () => {
 
   const dispatch = useDispatch();
 
-  // Chi hien thi he thong rap co lich chieu cho chinh bo phim dang xem
-  // (System_ShowTime.heThongRapChieu da duoc backend loc san theo MaPhim),
-  // khong dung danh sach tat ca he thong rap nua.
   const systems = System_ShowTime?.heThongRapChieu || [];
 
   return (
@@ -47,5 +44,6 @@ const AllSystem = () => {
     </div>
   );
 };
+
 
 export default AllSystem;

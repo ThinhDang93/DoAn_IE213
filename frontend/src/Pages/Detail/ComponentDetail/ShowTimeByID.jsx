@@ -146,6 +146,7 @@ const ComplexShowtimes = ({ rap, dispatch }) => {
                   {timeStr}
                 </span>
                 <span className="text-sm leading-tight">{giaLabel}</span>
+                <span>{lich.}</span>
               </button>
             </NavLink>
           );

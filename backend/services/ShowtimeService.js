@@ -44,6 +44,25 @@ export const XoaLichChieu = async (id) => {
     return Showtime.findByIdAndDelete(id).lean();
 };
 
+// 1 phong chieu vat ly chi chieu duoc 1 suat tai 1 thoi diem, bat ke phim
+// nao - kiem tra trung theo dung (maRap, ngayChieuGioChieu), khac phong thi
+// van cho phep du trung gio. excludeId dung khi cap nhat de khong tu trung
+// voi chinh no.
+export const TonTaiLichChieuTrungGio = async (
+    maRap,
+    ngayChieuGioChieu,
+    excludeId
+) => {
+    const filter = { maRap, ngayChieuGioChieu };
+
+    if (excludeId) {
+        filter._id = { $ne: excludeId };
+    }
+
+    const conflict = await Showtime.findOne(filter).lean();
+    return Boolean(conflict);
+};
+
 export const LayThongTinLichChieuPhim = async (maPhim) => {
     return LayDanhSachLichChieu({ maPhim });
 };
