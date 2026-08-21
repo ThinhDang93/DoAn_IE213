@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import { LayDanhSachPhimAPI } from "../../../API/APIFilm";
-import { LayDanhSachRapAPI } from "../../../API/CinemaAPI";
+import {
+  LayDanhSachCumRapAPI,
+  LayDanhSachHeThongRapAPI,
+  LayDanhSachRapAPI,
+} from "../../../API/CinemaAPI";
 import {
   CapNhatLichChieuAPI,
   LayThongTinLichChieuAPI,
@@ -17,7 +21,11 @@ const FormShowtime = () => {
   const isEdit = !!match;
 
   const [movies, setMovies] = useState([]);
+  const [systems, setSystems] = useState([]);
+  const [complexes, setComplexes] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [selectedHeThongRap, setSelectedHeThongRap] = useState("");
+  const [selectedCumRap, setSelectedCumRap] = useState("");
 
   const frmShowtime = useFormik({
     enableReinitialize: true,
@@ -47,33 +55,57 @@ const FormShowtime = () => {
     },
   });
 
-  const loadOptions = async () => {
-    const [movieList, roomList] = await Promise.all([
-      LayDanhSachPhimAPI(),
-      LayDanhSachRapAPI(),
-    ]);
-    setMovies(movieList);
-    setRooms(roomList);
+  const complexesForSystem = complexes.filter(
+    (c) => c.maHeThongRap === selectedHeThongRap
+  );
+  const roomsForComplex = rooms.filter((r) => r.maCumRap === selectedCumRap);
+
+  const handleHeThongRapChange = (e) => {
+    setSelectedHeThongRap(e.target.value);
+    setSelectedCumRap("");
+    frmShowtime.setFieldValue("maRap", "");
   };
 
-  const loadShowtimeEdit = async () => {
-    const data = await LayThongTinLichChieuAPI(params.maLichChieu);
-    frmShowtime.setValues({
-      maPhim: data.maPhim,
-      maRap: data.maRap,
-      ngayChieuGioChieu: toVietnamDatetimeLocalValue(data.ngayChieuGioChieu),
-      giaVe: data.giaVe,
-    });
+  const handleCumRapChange = (e) => {
+    setSelectedCumRap(e.target.value);
+    frmShowtime.setFieldValue("maRap", "");
   };
 
   useEffect(() => {
-    loadOptions();
-  }, []);
+    const init = async () => {
+      const [movieList, systemList, complexList, roomList] = await Promise.all([
+        LayDanhSachPhimAPI(),
+        LayDanhSachHeThongRapAPI(),
+        LayDanhSachCumRapAPI(),
+        LayDanhSachRapAPI(),
+      ]);
+      setMovies(movieList);
+      setSystems(systemList);
+      setComplexes(complexList);
+      setRooms(roomList);
 
-  useEffect(() => {
-    if (isEdit && params.maLichChieu) {
-      loadShowtimeEdit();
-    }
+      if (isEdit && params.maLichChieu) {
+        const data = await LayThongTinLichChieuAPI(params.maLichChieu);
+        // Phong chieu da luu khong kem theo cum rap/he thong rap, phai tu
+        // suy nguoc lai tu danh sach da tai o tren de do dung 3 dropdown
+        // khi mo form sua lich chieu.
+        const room = roomList.find((r) => r.maRap === data.maRap);
+        const complex = room
+          ? complexList.find((c) => c.maCumRap === room.maCumRap)
+          : null;
+
+        setSelectedHeThongRap(complex?.maHeThongRap || "");
+        setSelectedCumRap(room?.maCumRap || "");
+        frmShowtime.setValues({
+          maPhim: data.maPhim,
+          maRap: data.maRap,
+          ngayChieuGioChieu: toVietnamDatetimeLocalValue(data.ngayChieuGioChieu),
+          giaVe: data.giaVe,
+        });
+      }
+    };
+
+    init();
   }, [isEdit, params.maLichChieu]);
 
   return (
@@ -107,17 +139,53 @@ const FormShowtime = () => {
         </div>
 
         <div>
+          <label className="block mb-1 font-medium">Hệ thống rạp</label>
+          <select
+            value={selectedHeThongRap}
+            onChange={handleHeThongRapChange}
+            className="w-full border rounded-lg p-2"
+            required
+          >
+            <option value="">-- Chọn hệ thống rạp --</option>
+            {systems.map((s) => (
+              <option key={s.maHeThongRap} value={s.maHeThongRap}>
+                {s.tenHeThongRap}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Cụm rạp</label>
+          <select
+            value={selectedCumRap}
+            onChange={handleCumRapChange}
+            className="w-full border rounded-lg p-2 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            disabled={!selectedHeThongRap}
+            required
+          >
+            <option value="">-- Chọn cụm rạp --</option>
+            {complexesForSystem.map((c) => (
+              <option key={c.maCumRap} value={c.maCumRap}>
+                {c.tenCumRap}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="block mb-1 font-medium">Phòng chiếu</label>
           <select
             id="maRap"
             name="maRap"
             value={frmShowtime.values.maRap}
             onChange={frmShowtime.handleChange}
-            className="w-full border rounded-lg p-2"
+            className="w-full border rounded-lg p-2 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            disabled={!selectedCumRap}
             required
           >
             <option value="">-- Chọn phòng chiếu --</option>
-            {rooms.map((r) => (
+            {roomsForComplex.map((r) => (
               <option key={r.maRap} value={r.maRap}>
                 {r.tenRap}
               </option>

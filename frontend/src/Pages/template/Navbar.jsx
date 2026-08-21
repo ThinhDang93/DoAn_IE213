@@ -141,12 +141,18 @@ const Navbar = () => {
               </NavLink>
             </li>
             <li>
-              <a
-                href="#"
-                className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+              <NavLink
+                to={"/tin-tuc"}
+                className={({ isActive }) =>
+                  `block py-2 px-3 rounded-sm md:p-0 ${
+                    isActive
+                      ? "text-blue-700 font-semibold"
+                      : "text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700"
+                  }`
+                }
               >
                 Tin tức
-              </a>
+              </NavLink>
             </li>
             <li className="md:ml-2">
               <form onSubmit={handleSearchSubmit} className="flex items-center">

@@ -14,7 +14,12 @@ import {
   XoaRapAPI,
 } from "../../../API/CinemaAPI";
 
-const emptySystemForm = { tenHeThongRap: "", logo: "" };
+const emptySystemForm = {
+  tenHeThongRap: "",
+  logo: "",
+  gioiThieu: "",
+  namThanhLap: "",
+};
 const emptyComplexForm = { tenCumRap: "", diaChi: "", hinhAnh: "", maHeThongRap: "" };
 const emptyRoomForm = { tenRap: "", maCumRap: "", soLuongGhe: "" };
 
@@ -38,9 +43,13 @@ const CinemaManager = () => {
 
   const [systemForm, setSystemForm] = useState(emptySystemForm);
   const [editingSystem, setEditingSystem] = useState(null);
+  const [systemGalleryFiles, setSystemGalleryFiles] = useState([]);
+  const [systemExistingGallery, setSystemExistingGallery] = useState([]);
 
   const [complexForm, setComplexForm] = useState(emptyComplexForm);
   const [editingComplex, setEditingComplex] = useState(null);
+  const [complexGalleryFiles, setComplexGalleryFiles] = useState([]);
+  const [complexExistingGallery, setComplexExistingGallery] = useState([]);
 
   const [roomForm, setRoomForm] = useState(emptyRoomForm);
   const [editingRoom, setEditingRoom] = useState(null);
@@ -64,12 +73,16 @@ const CinemaManager = () => {
   const submitSystem = async (e) => {
     e.preventDefault();
     try {
+      const payload = { ...systemForm, galleryFiles: systemGalleryFiles };
       if (editingSystem) {
-        await CapNhatHeThongRapAPI(editingSystem, systemForm);
+        payload.keptGalleryUrls = systemExistingGallery;
+        await CapNhatHeThongRapAPI(editingSystem, payload);
       } else {
-        await ThemHeThongRapAPI(systemForm);
+        await ThemHeThongRapAPI(payload);
       }
       setSystemForm(emptySystemForm);
+      setSystemGalleryFiles([]);
+      setSystemExistingGallery([]);
       setEditingSystem(null);
       await loadAll();
     } catch (error) {
@@ -79,7 +92,14 @@ const CinemaManager = () => {
 
   const editSystem = (s) => {
     setEditingSystem(s.maHeThongRap);
-    setSystemForm({ tenHeThongRap: s.tenHeThongRap, logo: s.logo });
+    setSystemForm({
+      tenHeThongRap: s.tenHeThongRap,
+      logo: s.logo,
+      gioiThieu: s.gioiThieu || "",
+      namThanhLap: s.namThanhLap || "",
+    });
+    setSystemGalleryFiles([]);
+    setSystemExistingGallery(s.danhSachHinhAnh || []);
   };
 
   const deleteSystem = async (maHeThongRap) => {
@@ -96,12 +116,16 @@ const CinemaManager = () => {
   const submitComplex = async (e) => {
     e.preventDefault();
     try {
+      const payload = { ...complexForm, galleryFiles: complexGalleryFiles };
       if (editingComplex) {
-        await CapNhatCumRapAPI(editingComplex, complexForm);
+        payload.keptGalleryUrls = complexExistingGallery;
+        await CapNhatCumRapAPI(editingComplex, payload);
       } else {
-        await ThemCumRapAPI(complexForm);
+        await ThemCumRapAPI(payload);
       }
       setComplexForm(emptyComplexForm);
+      setComplexGalleryFiles([]);
+      setComplexExistingGallery([]);
       setEditingComplex(null);
       await loadAll();
     } catch (error) {
@@ -117,6 +141,8 @@ const CinemaManager = () => {
       hinhAnh: c.hinhAnh,
       maHeThongRap: c.maHeThongRap,
     });
+    setComplexGalleryFiles([]);
+    setComplexExistingGallery(c.danhSachHinhAnh || []);
   };
 
   const deleteComplex = async (maCumRap) => {
@@ -206,6 +232,72 @@ const CinemaManager = () => {
               />
             )}
           </div>
+          <textarea
+            placeholder="Giới thiệu hệ thống rạp"
+            value={systemForm.gioiThieu}
+            onChange={(e) =>
+              setSystemForm({ ...systemForm, gioiThieu: e.target.value })
+            }
+            className="border rounded-lg p-2 w-full min-w-64"
+            rows={2}
+          />
+          <input
+            placeholder="Năm thành lập"
+            type="number"
+            value={systemForm.namThanhLap}
+            onChange={(e) =>
+              setSystemForm({ ...systemForm, namThanhLap: e.target.value })
+            }
+            className="border rounded-lg p-2 w-40"
+          />
+          <div className="w-full">
+            <label className="block text-sm text-gray-600 mb-1">
+              Ảnh gallery (chọn nhiều)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) =>
+                setSystemGalleryFiles(Array.from(e.target.files))
+              }
+              className="border rounded-lg p-2 w-full"
+            />
+            {(systemExistingGallery.length > 0 ||
+              systemGalleryFiles.length > 0) && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {systemExistingGallery.map((url, idx) => (
+                  <div key={url} className="relative">
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-16 h-16 object-cover border rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSystemExistingGallery(
+                          systemExistingGallery.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs leading-5"
+                      title="Xoá ảnh này"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                {systemGalleryFiles.map((file, idx) => (
+                  <img
+                    key={idx}
+                    src={getPreviewUrl(file)}
+                    alt=""
+                    className="w-16 h-16 object-cover border-2 border-blue-400 rounded"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <button type="submit" className={btnPrimary}>
             {editingSystem ? "Cập nhật" : "+ Thêm"}
           </button>
@@ -216,6 +308,8 @@ const CinemaManager = () => {
               onClick={() => {
                 setEditingSystem(null);
                 setSystemForm(emptySystemForm);
+                setSystemGalleryFiles([]);
+                setSystemExistingGallery([]);
               }}
             >
               Huỷ sửa
@@ -295,6 +389,54 @@ const CinemaManager = () => {
               />
             )}
           </div>
+          <div className="w-full">
+            <label className="block text-sm text-gray-600 mb-1">
+              Ảnh gallery (chọn nhiều)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) =>
+                setComplexGalleryFiles(Array.from(e.target.files))
+              }
+              className="border rounded-lg p-2 w-full"
+            />
+            {(complexExistingGallery.length > 0 ||
+              complexGalleryFiles.length > 0) && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {complexExistingGallery.map((url, idx) => (
+                  <div key={url} className="relative">
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-16 h-16 object-cover border rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setComplexExistingGallery(
+                          complexExistingGallery.filter((_, i) => i !== idx)
+                        )
+                      }
+                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs leading-5"
+                      title="Xoá ảnh này"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                {complexGalleryFiles.map((file, idx) => (
+                  <img
+                    key={idx}
+                    src={getPreviewUrl(file)}
+                    alt=""
+                    className="w-16 h-16 object-cover border-2 border-blue-400 rounded"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <select
             value={complexForm.maHeThongRap}
             onChange={(e) =>
@@ -320,6 +462,8 @@ const CinemaManager = () => {
               onClick={() => {
                 setEditingComplex(null);
                 setComplexForm(emptyComplexForm);
+                setComplexGalleryFiles([]);
+                setComplexExistingGallery([]);
               }}
             >
               Huỷ sửa

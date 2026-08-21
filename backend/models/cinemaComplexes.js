@@ -16,6 +16,10 @@ const cinemaComplexSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        danhSachHinhAnh: {
+            type: [String],
+            default: [],
+        },
         maHeThongRap: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "CinemaSystem",

@@ -11,6 +11,18 @@ const cinemaSystemSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        gioiThieu: {
+            type: String,
+            default: "",
+        },
+        namThanhLap: {
+            type: Number,
+            default: null,
+        },
+        danhSachHinhAnh: {
+            type: [String],
+            default: [],
+        },
     },
     {
         timestamps: true,

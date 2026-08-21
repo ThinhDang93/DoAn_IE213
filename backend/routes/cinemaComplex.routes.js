@@ -15,11 +15,16 @@ router.get("/LayDanhSachCumRap", LayDanhSachCumRap);
 
 router.get("/LayThongTinCumRap", LayThongTinCumRap);
 
+const uploadCumRapFields = uploadCinemaComplex.fields([
+    { name: "File", maxCount: 1 },
+    { name: "Gallery", maxCount: 8 },
+]);
+
 router.post(
     "/ThemCumRap",
     verifyToken,
     checkAdmin,
-    uploadCinemaComplex.single("File"),
+    uploadCumRapFields,
     ThemCumRap
 );
 
@@ -27,7 +32,7 @@ router.put(
     "/CapNhatCumRap",
     verifyToken,
     checkAdmin,
-    uploadCinemaComplex.single("File"),
+    uploadCumRapFields,
     CapNhatCumRap
 );
 

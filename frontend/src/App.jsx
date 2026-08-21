@@ -11,6 +11,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Detail from "./Pages/Detail/Detail";
 import CinemaListPage from "./Pages/Cinema/CinemaListPage";
+import CinemaSystemDetailPage from "./Pages/Cinema/CinemaSystemDetailPage";
+import NewsPage from "./Pages/News/NewsPage";
 import Booking from "./Pages/Booking/Booking";
 import Profile from "./Pages/Profile/Profile";
 import Ad_FilmManagement from "./Pages/Admin/Ad_FilmManagement";
@@ -51,6 +53,11 @@ const App = () => {
                 <Route path=":maLichChieu" element={<Booking />} />
               </Route>
               <Route path="/rap" element={<CinemaListPage />} />
+              <Route
+                path="/rap/:maHeThongRap"
+                element={<CinemaSystemDetailPage />}
+              />
+              <Route path="/tin-tuc" element={<NewsPage />} />
               <Route
                 path="/profile"
                 element={

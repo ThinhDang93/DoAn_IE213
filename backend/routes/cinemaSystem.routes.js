@@ -12,11 +12,16 @@ const router = express.Router();
 
 router.get("/LayThongTinHeThongRap", LayThongTinHeThongRap);
 
+const uploadHeThongRapFields = uploadCinemaSystem.fields([
+    { name: "File", maxCount: 1 },
+    { name: "Gallery", maxCount: 8 },
+]);
+
 router.post(
     "/ThemHeThongRap",
     verifyToken,
     checkAdmin,
-    uploadCinemaSystem.single("File"),
+    uploadHeThongRapFields,
     ThemHeThongRap
 );
 
@@ -24,7 +29,7 @@ router.put(
     "/CapNhatHeThongRap",
     verifyToken,
     checkAdmin,
-    uploadCinemaSystem.single("File"),
+    uploadHeThongRapFields,
     CapNhatHeThongRap
 );
 

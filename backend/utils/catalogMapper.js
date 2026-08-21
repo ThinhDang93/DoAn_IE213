@@ -69,6 +69,11 @@ export const mapCinemaSystem = (system, req) => ({
     maHeThongRap: toIdString(system._id || system.maHeThongRap),
     tenHeThongRap: system.tenHeThongRap || "",
     logo: toAbsoluteAssetUrl(req, system.logo),
+    gioiThieu: system.gioiThieu || "",
+    namThanhLap: system.namThanhLap ?? null,
+    danhSachHinhAnh: (system.danhSachHinhAnh || []).map((url) =>
+        toAbsoluteAssetUrl(req, url)
+    ),
 });
 
 export const mapCinemaComplex = (complex, req) => ({
@@ -76,6 +81,9 @@ export const mapCinemaComplex = (complex, req) => ({
     tenCumRap: complex.tenCumRap || "",
     diaChi: complex.diaChi || "",
     hinhAnh: toAbsoluteAssetUrl(req, complex.hinhAnh),
+    danhSachHinhAnh: (complex.danhSachHinhAnh || []).map((url) =>
+        toAbsoluteAssetUrl(req, url)
+    ),
     maHeThongRap: toIdString(complex.maHeThongRap),
 });
 

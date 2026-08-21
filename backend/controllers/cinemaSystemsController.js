@@ -37,8 +37,9 @@ export const LayThongTinHeThongRap = async (req, res) => {
 
 export const ThemHeThongRap = async (req, res) => {
     try {
-        const { tenHeThongRap, logo } = req.body;
-        const logoUrl = req.file ? req.file.path : logo;
+        const { tenHeThongRap, logo, gioiThieu, namThanhLap } = req.body;
+        const logoUrl = req.files?.File?.[0]?.path || logo;
+        const galleryFiles = (req.files?.Gallery || []).map((file) => file.path);
 
         if (!tenHeThongRap || !logoUrl) {
             return sendError(
@@ -51,6 +52,11 @@ export const ThemHeThongRap = async (req, res) => {
         const createdSystem = await CinemaSystemService.ThemHeThongRap({
             tenHeThongRap,
             logo: logoUrl,
+            ...(gioiThieu !== undefined ? { gioiThieu } : {}),
+            ...(namThanhLap !== undefined && namThanhLap !== ""
+                ? { namThanhLap: Number(namThanhLap) }
+                : {}),
+            danhSachHinhAnh: galleryFiles,
         });
 
         return sendSuccess(
@@ -66,8 +72,16 @@ export const ThemHeThongRap = async (req, res) => {
 
 export const CapNhatHeThongRap = async (req, res) => {
     try {
-        const { maHeThongRap, tenHeThongRap, logo } = req.body;
-        const logoUrl = req.file ? req.file.path : logo;
+        const {
+            maHeThongRap,
+            tenHeThongRap,
+            logo,
+            gioiThieu,
+            namThanhLap,
+            danhSachHinhAnhGiuLai,
+        } = req.body;
+        const logoUrl = req.files?.File?.[0]?.path || logo;
+        const galleryFiles = (req.files?.Gallery || []).map((file) => file.path);
 
         if (!maHeThongRap) {
             return sendError(res, new Error("Missing maHeThongRap"), 400);
@@ -77,11 +91,27 @@ export const CapNhatHeThongRap = async (req, res) => {
             return sendError(res, new Error("maHeThongRap is invalid"), 400);
         }
 
+        let danhSachHinhAnh;
+        if (danhSachHinhAnhGiuLai !== undefined) {
+            const keptImages = JSON.parse(danhSachHinhAnhGiuLai);
+            danhSachHinhAnh = [...keptImages, ...galleryFiles];
+        } else if (galleryFiles.length > 0) {
+            const existing = await CinemaSystemService.LayThongTinHeThongRap(
+                maHeThongRap
+            );
+            danhSachHinhAnh = [...(existing?.danhSachHinhAnh || []), ...galleryFiles];
+        }
+
         const updatedSystem = await CinemaSystemService.CapNhatHeThongRap(
             maHeThongRap,
             {
                 ...(tenHeThongRap !== undefined ? { tenHeThongRap } : {}),
                 ...(logoUrl !== undefined ? { logo: logoUrl } : {}),
+                ...(gioiThieu !== undefined ? { gioiThieu } : {}),
+                ...(namThanhLap !== undefined && namThanhLap !== ""
+                    ? { namThanhLap: Number(namThanhLap) }
+                    : {}),
+                ...(danhSachHinhAnh !== undefined ? { danhSachHinhAnh } : {}),
             }
         );
 

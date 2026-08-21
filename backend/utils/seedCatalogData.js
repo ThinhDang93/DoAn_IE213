@@ -16,14 +16,28 @@ const seedCinemaSystems = async () => {
         {
             tenHeThongRap: "CGV Cinemas",
             logo: "https://placehold.co/120x120/png?text=CGV",
+            gioiThieu:
+                "Hệ thống rạp chiếu phim lớn nhất Việt Nam với công nghệ hình ảnh và âm thanh hiện đại.",
+            namThanhLap: 1998,
+            danhSachHinhAnh: [
+                "https://placehold.co/640x360/png?text=CGV+1",
+                "https://placehold.co/640x360/png?text=CGV+2",
+            ],
         },
         {
             tenHeThongRap: "Lotte Cinema",
             logo: "https://placehold.co/120x120/png?text=Lotte",
+            gioiThieu:
+                "Chuỗi rạp chiếu phim đến từ Hàn Quốc, có mặt tại nhiều trung tâm thương mại lớn.",
+            namThanhLap: 1999,
+            danhSachHinhAnh: ["https://placehold.co/640x360/png?text=Lotte+1"],
         },
         {
             tenHeThongRap: "BHD Star",
             logo: "https://placehold.co/120x120/png?text=BHD",
+            gioiThieu: "Thương hiệu rạp chiếu phim Việt Nam với không gian hiện đại, sang trọng.",
+            namThanhLap: 2003,
+            danhSachHinhAnh: ["https://placehold.co/640x360/png?text=BHD+1"],
         },
     ]);
 };
@@ -44,18 +58,27 @@ const seedCinemaComplexes = async (systems) => {
             tenCumRap: "CGV Vincom Dong Khoi",
             diaChi: "72 Le Thanh Ton, Quan 1, TP.HCM",
             hinhAnh: "https://placehold.co/400x240/png?text=CGV+Dong+Khoi",
+            danhSachHinhAnh: [
+                "https://placehold.co/640x360/png?text=CGV+Dong+Khoi+1",
+            ],
             maHeThongRap: firstSystem._id,
         },
         {
             tenCumRap: "Lotte Nowzone",
             diaChi: "235 Nguyen Van Cu, Quan 1, TP.HCM",
             hinhAnh: "https://placehold.co/400x240/png?text=Lotte+Nowzone",
+            danhSachHinhAnh: [
+                "https://placehold.co/640x360/png?text=Lotte+Nowzone+1",
+            ],
             maHeThongRap: secondSystem._id,
         },
         {
             tenCumRap: "BHD Bitexco",
             diaChi: "2 Hai Trieu, Quan 1, TP.HCM",
             hinhAnh: "https://placehold.co/400x240/png?text=BHD+Bitexco",
+            danhSachHinhAnh: [
+                "https://placehold.co/640x360/png?text=BHD+Bitexco+1",
+            ],
             maHeThongRap: thirdSystem._id,
         },
     ]);

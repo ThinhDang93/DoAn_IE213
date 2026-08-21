@@ -58,7 +58,8 @@ export const LayThongTinCumRap = async (req, res) => {
 export const ThemCumRap = async (req, res) => {
     try {
         const { tenCumRap, diaChi, hinhAnh = "", maHeThongRap } = req.body;
-        const hinhAnhUrl = req.file ? req.file.path : hinhAnh;
+        const hinhAnhUrl = req.files?.File?.[0]?.path || hinhAnh;
+        const galleryFiles = (req.files?.Gallery || []).map((file) => file.path);
 
         if (!tenCumRap || !diaChi || !maHeThongRap) {
             return sendError(
@@ -85,6 +86,7 @@ export const ThemCumRap = async (req, res) => {
             diaChi,
             hinhAnh: hinhAnhUrl,
             maHeThongRap,
+            danhSachHinhAnh: galleryFiles,
         });
 
         return sendSuccess(
@@ -100,8 +102,16 @@ export const ThemCumRap = async (req, res) => {
 
 export const CapNhatCumRap = async (req, res) => {
     try {
-        const { maCumRap, tenCumRap, diaChi, hinhAnh, maHeThongRap } = req.body;
-        const hinhAnhUrl = req.file ? req.file.path : hinhAnh;
+        const {
+            maCumRap,
+            tenCumRap,
+            diaChi,
+            hinhAnh,
+            maHeThongRap,
+            danhSachHinhAnhGiuLai,
+        } = req.body;
+        const hinhAnhUrl = req.files?.File?.[0]?.path || hinhAnh;
+        const galleryFiles = (req.files?.Gallery || []).map((file) => file.path);
 
         if (!maCumRap) {
             return sendError(res, new Error("Missing maCumRap"), 400);
@@ -125,11 +135,21 @@ export const CapNhatCumRap = async (req, res) => {
             }
         }
 
+        let danhSachHinhAnh;
+        if (danhSachHinhAnhGiuLai !== undefined) {
+            const keptImages = JSON.parse(danhSachHinhAnhGiuLai);
+            danhSachHinhAnh = [...keptImages, ...galleryFiles];
+        } else if (galleryFiles.length > 0) {
+            const existing = await CinemaComplexService.LayThongTinCumRap(maCumRap);
+            danhSachHinhAnh = [...(existing?.danhSachHinhAnh || []), ...galleryFiles];
+        }
+
         const updatedComplex = await CinemaComplexService.CapNhatCumRap(maCumRap, {
             ...(tenCumRap !== undefined ? { tenCumRap } : {}),
             ...(diaChi !== undefined ? { diaChi } : {}),
             ...(hinhAnhUrl !== undefined ? { hinhAnh: hinhAnhUrl } : {}),
             ...(maHeThongRap !== undefined ? { maHeThongRap } : {}),
+            ...(danhSachHinhAnh !== undefined ? { danhSachHinhAnh } : {}),
         });
 
         if (!updatedComplex) {

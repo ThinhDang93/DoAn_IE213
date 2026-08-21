@@ -1,6 +1,6 @@
 import { http } from "../utils/interceptor";
 
-const toFormData = (fields, fileKey) => {
+const toFormData = (fields, fileKey, galleryFiles = [], keptGalleryUrls) => {
   const formData = new FormData();
 
   Object.entries(fields).forEach(([key, value]) => {
@@ -20,6 +20,16 @@ const toFormData = (fields, fileKey) => {
     formData.append(key, value);
   });
 
+  galleryFiles.forEach((file) => {
+    if (file instanceof File) {
+      formData.append("Gallery", file);
+    }
+  });
+
+  if (keptGalleryUrls !== undefined) {
+    formData.append("danhSachHinhAnhGiuLai", JSON.stringify(keptGalleryUrls));
+  }
+
   return formData;
 };
 
@@ -29,8 +39,16 @@ export const LayDanhSachHeThongRapAPI = async () => {
   return res.data.content;
 };
 
+export const LayThongTinHeThongRapByIdAPI = async (maHeThongRap) => {
+  const res = await http.get(
+    `/api/QuanLyHeThongRap/LayThongTinHeThongRap?MaHeThongRap=${maHeThongRap}`
+  );
+  return res.data.content;
+};
+
 export const ThemHeThongRapAPI = async (data) => {
-  const formData = toFormData(data, "logo");
+  const { galleryFiles, ...fields } = data;
+  const formData = toFormData(fields, "logo", galleryFiles);
   const res = await http.post(
     "/api/QuanLyHeThongRap/ThemHeThongRap",
     formData
@@ -39,7 +57,13 @@ export const ThemHeThongRapAPI = async (data) => {
 };
 
 export const CapNhatHeThongRapAPI = async (maHeThongRap, data) => {
-  const formData = toFormData({ maHeThongRap, ...data }, "logo");
+  const { galleryFiles, keptGalleryUrls, ...fields } = data;
+  const formData = toFormData(
+    { maHeThongRap, ...fields },
+    "logo",
+    galleryFiles,
+    keptGalleryUrls
+  );
   const res = await http.put(
     "/api/QuanLyHeThongRap/CapNhatHeThongRap",
     formData
@@ -55,19 +79,27 @@ export const XoaHeThongRapAPI = async (maHeThongRap) => {
 };
 
 // Cum rap
-export const LayDanhSachCumRapAPI = async () => {
-  const res = await http.get("/api/QuanLyCumRap/LayDanhSachCumRap");
+export const LayDanhSachCumRapAPI = async (maHeThongRap) => {
+  const query = maHeThongRap ? `?MaHeThongRap=${maHeThongRap}` : "";
+  const res = await http.get(`/api/QuanLyCumRap/LayDanhSachCumRap${query}`);
   return res.data.content;
 };
 
 export const ThemCumRapAPI = async (data) => {
-  const formData = toFormData(data, "hinhAnh");
+  const { galleryFiles, ...fields } = data;
+  const formData = toFormData(fields, "hinhAnh", galleryFiles);
   const res = await http.post("/api/QuanLyCumRap/ThemCumRap", formData);
   return res.data;
 };
 
 export const CapNhatCumRapAPI = async (maCumRap, data) => {
-  const formData = toFormData({ maCumRap, ...data }, "hinhAnh");
+  const { galleryFiles, keptGalleryUrls, ...fields } = data;
+  const formData = toFormData(
+    { maCumRap, ...fields },
+    "hinhAnh",
+    galleryFiles,
+    keptGalleryUrls
+  );
   const res = await http.put("/api/QuanLyCumRap/CapNhatCumRap", formData);
   return res.data;
 };
