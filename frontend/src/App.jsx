@@ -13,6 +13,7 @@ import Detail from "./Pages/Detail/Detail";
 import CinemaListPage from "./Pages/Cinema/CinemaListPage";
 import CinemaSystemDetailPage from "./Pages/Cinema/CinemaSystemDetailPage";
 import NewsPage from "./Pages/News/NewsPage";
+import PaymentPending from "./Pages/Payment/PaymentPending";
 import Booking from "./Pages/Booking/Booking";
 import Profile from "./Pages/Profile/Profile";
 import Ad_FilmManagement from "./Pages/Admin/Ad_FilmManagement";
@@ -52,6 +53,14 @@ const App = () => {
               <Route path="booking">
                 <Route path=":maLichChieu" element={<Booking />} />
               </Route>
+              <Route
+                path="thanh-toan/:maVe"
+                element={
+                  <ProtectedRoute>
+                    <PaymentPending />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/rap" element={<CinemaListPage />} />
               <Route
                 path="/rap/:maHeThongRap"

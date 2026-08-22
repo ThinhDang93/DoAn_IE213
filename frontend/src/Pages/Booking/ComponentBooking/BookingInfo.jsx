@@ -62,10 +62,9 @@ const BookingInfo = () => {
 
     try {
       setSubmitting(true);
-      await DatVeAPI(param.maLichChieu, gheDangChon);
-      alert("Đặt vé thành công!");
+      const res = await DatVeAPI(param.maLichChieu, gheDangChon);
       dispatch(clearSeat());
-      navigate("/");
+      navigate(`/thanh-toan/${res.content.maVe}`);
     } catch (error) {
       const message = error?.response?.data?.message || "Đặt vé thất bại";
       alert(message);

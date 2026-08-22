@@ -515,3 +515,349 @@ So với phạm vi note gốc (chỉ dự kiến hoàn thiện Backend + Databas
 - **Đề xuất bước tiếp theo nếu còn thời gian:** dọn endpoint trùng lặp ở mục 6.2; viết Postman
   collection hoặc test tự động cho các luồng chính (đặt vé, huỷ vé, admin CRUD) để không phải test
   tay lại từ đầu mỗi lần có thay đổi; cân nhắc thêm UI đổi mật khẩu nếu người dùng có nhu cầu.
+
+## 11. Bổ sung cho báo cáo (2026-08-21)
+
+> Toàn bộ nội dung mục này được chạy thử **thật** (không suy đoán) vào ngày kiểm thử, dùng dữ liệu
+> đang có sẵn trong MongoDB Atlas dùng chung của nhóm. Test ghi/xoá dùng tài khoản admin tạm thời
+> (`__temp_test_admin__`) và các bản ghi test tự tạo — **tất cả đã được xoá sạch ngay sau khi test**,
+> không để lại rác trong DB chung. Các endpoint GET (đọc) dùng thẳng dữ liệu thật đang có, không tạo
+> thêm gì.
+
+### 11.1 Ví dụ request/response thật cho từng endpoint — Catalog (mục 6.2) & Booking (mục 6.3)
+
+Test chạy qua backend dev local (`http://localhost:8080`) — **kết nối cùng 1 cluster MongoDB Atlas**
+với backend production trên Render (xem mục 11.2), nên dữ liệu và hành vi hoàn toàn giống hệt việc
+gọi trực tiếp vào production. Định dạng giống mục 6.1 (Auth & User): mỗi endpoint có ví dụ request
+thật + response thật, rút gọn phần `content` dài (mảng nhiều phần tử) chỉ giữ 1-2 phần tử đại diện.
+
+#### Phim — `/api/QuanLyPhim`
+
+**GET `/LayThongTinPhim?MaPhim=6a82cd53684ff0a3456d9d22`**
+```json
+{
+    "statusCode": 200,
+    "message": "Lay thong tin phim thanh cong",
+    "content": {
+        "maPhim": "6a82cd53684ff0a3456d9d22",
+        "tenPhim": "Zero Hour",
+        "trailer": "https://www.youtube.com/watch?v=devseed013",
+        "moTa": "Adventure movie directed by Olivia Hayes...",
+        "ngayKhoiChieu": "2026-07-18T17:00:00.000Z",
+        "dangChieu": true,
+        "sapChieu": false,
+        "hot": false,
+        "danhGia": 8,
+        "hinhAnh": "https://res.cloudinary.com/ilmsqrsb/image/upload/.../o5mvkjeiaycsclxf3ogh.jpg",
+        "theLoai": "",
+        "daoDien": "",
+        "dienVien": "",
+        "thoiLuong": 0,
+        "doTuoi": "",
+        "dinhDang": "4DX"
+    }
+}
+```
+
+**POST `/ThemPhimUploadHinh`** (multipart: `tenPhim=Phim Test Bao Cao`, `ngayKhoiChieu=15/09/2026`,
+`danhGia=7`, `File=<ảnh>`)
+```json
+{
+    "statusCode": 201,
+    "message": "Them phim thanh cong",
+    "content": {
+        "maPhim": "6a88f465e190c5fd4107203c",
+        "tenPhim": "Phim Test Bao Cao",
+        "ngayKhoiChieu": "2026-09-14T17:00:00.000Z",
+        "danhGia": 7,
+        "hinhAnh": "https://res.cloudinary.com/ilmsqrsb/image/upload/.../csklwndqmzng0bejci5r.png",
+        "...": "(các field còn lại về default rỗng/false vì không truyền)"
+    }
+}
+```
+
+**PUT `/CapNhatPhimUpload`** (multipart: `maPhim=6a88f465e190c5fd4107203c`, `danhGia=9`) → `danhGia`
+đổi thành `9`, `statusCode: 200`.
+
+**DELETE `/XoaPhim?MaPhim=6a88f465e190c5fd4107203c`** → `{"statusCode":200,"message":"Xoa phim thanh cong","content":null}`.
+
+#### Banner — `/api/QuanLyBanner`
+
+**GET `/LayDanhSachBanner`**
+```json
+{
+  "statusCode": 200,
+  "message": "Lay danh sach banner thanh cong",
+  "content": [
+    { "maBanner": "6a83e5912685e72744d8948c", "hinhAnh": "https://res.cloudinary.com/.../ndxeaq2o416fgynslta3.jpg", "thuTu": 1 }
+  ]
+}
+```
+
+**POST `/ThemBanner`** (multipart: `File=<ảnh>`, `thuTu=50`) → `201`, trả `maBanner` mới +
+`hinhAnh` là URL Cloudinary thật (`.../banners/p5xt5n9t1ljexskk8ur7.png`).
+
+**PUT `/CapNhatBanner`** (multipart: `maBanner=...`, `thuTu=51`) → `200`, `thuTu` đổi thành `51`.
+
+**DELETE `/XoaBanner?MaBanner=...`** → `200`, `content: null`.
+
+#### Hệ thống rạp — `/api/QuanLyHeThongRap`
+
+**GET `/LayThongTinHeThongRap`** (danh sách, không truyền `?MaHeThongRap=`)
+```json
+{
+  "statusCode": 200,
+  "content": [
+    {
+      "maHeThongRap": "6a885fc086c8fc1ae6b43485",
+      "tenHeThongRap": "Empire Cinema",
+      "logo": "https://res.cloudinary.com/.../kr1jtgmtcwi3ttwwi0qp.png",
+      "gioiThieu": "Hệ thống Empire Cinema được trang bị ....",
+      "namThanhLap": 2022,
+      "danhSachHinhAnh": [
+        "https://res.cloudinary.com/.../wxzxe4ywxyftseqq4ria.webp",
+        "https://res.cloudinary.com/.../lnkjhentx8sufi5onwve.jpg"
+      ]
+    }
+  ]
+}
+```
+
+**GET `/LayThongTinHeThongRap?MaHeThongRap=...`** — cùng object trên nhưng `content` là **1 object**
+đơn (không phải mảng) khi có filter theo 1 hệ thống cụ thể.
+
+**POST `/ThemHeThongRap`** (multipart: `tenHeThongRap=He Thong Test CapNhat`, `File=<logo>`) → `201`,
+trả về đủ field kể cả `gioiThieu: ""`, `namThanhLap: null`, `danhSachHinhAnh: []` (default vì không
+truyền).
+
+**PUT `/CapNhatHeThongRap`** (multipart: `maHeThongRap=...`, `tenHeThongRap=He Thong Da Sua`,
+`gioiThieu=Da cap nhat gioi thieu`) → `200`, 2 field đổi đúng, các field khác giữ nguyên.
+
+**DELETE `/XoaHeThongRap?MaHeThongRap=...`** → `200` (test trên hệ thống không có cụm rạp con nên
+xoá được; nếu còn cụm rạp con sẽ trả `400` theo logic đã mô tả ở mục 6.2, không test lại case này).
+
+#### Cụm rạp — `/api/QuanLyCumRap`
+
+**GET `/LayDanhSachCumRap?MaHeThongRap=6a885fc086c8fc1ae6b43485`**
+```json
+{
+    "statusCode": 200,
+    "content": [
+        {
+            "maCumRap": "6a886e2986c8fc1ae6b43488",
+            "tenCumRap": "Empire Cinema Bắc Giang",
+            "diaChi": "Tầng 4, TTTM Bắc Giang Center, 45 Nguyễn Văn Cừ, Phường Ngô Quyền, TP. Bắc Giang",
+            "hinhAnh": "https://res.cloudinary.com/.../wlrkgdmprfhemsdublg5.jpg",
+            "danhSachHinhAnh": [],
+            "maHeThongRap": "6a885fc086c8fc1ae6b43485"
+        }
+    ]
+}
+```
+
+**GET `/LayThongTinCumRap?MaCumRap=6a8871dc6dc4fdc0ac5aed8a`** → 1 object, có thêm
+`danhSachHinhAnh: ["...a36pzezcri7ztvv3dcy9.jpg"]`.
+
+**POST `/ThemCumRap`** (multipart: `tenCumRap`, `diaChi`, `maHeThongRap`, `File=<ảnh>`) → `201`,
+trả `maCumRap` mới.
+
+**PUT `/CapNhatCumRap`** (multipart: `maCumRap=...`, `diaChi=2 Duong XYZ, Q3, TPHCM`) → `200`, `diaChi`
+đổi đúng, các field khác giữ nguyên (kể cả `hinhAnh` không đổi vì không gửi `File` mới).
+
+**DELETE `/XoaCumRap?MaCumRap=...`** → `200`.
+
+#### Phòng chiếu — `/api/QuanLyRap`
+
+**GET `/LayDanhSachRap?MaCumRap=6a8871dc6dc4fdc0ac5aed8a`**
+```json
+{
+    "statusCode": 200,
+    "content": [
+        { "maRap": "6a88722a6dc4fdc0ac5aed8d", "tenRap": "Phong 2", "maCumRap": "6a8871dc6dc4fdc0ac5aed8a", "soLuongGhe": 40 },
+        { "maRap": "6a88721e6dc4fdc0ac5aed8c", "tenRap": "Phong 1", "maCumRap": "6a8871dc6dc4fdc0ac5aed8a", "soLuongGhe": 30 }
+    ]
+}
+```
+
+**GET `/LayThongTinRap?MaRap=...`** → 1 object tương ứng.
+
+**POST `/ThemRap`** (JSON: `{"tenRap":"Phong Test Bao Cao","maCumRap":"...","soLuongGhe":20}`) →
+`201`, `maRap` mới; đồng thời **đã xác nhận** `syncSeatsForRoom()` chạy đúng — gọi tiếp
+`PUT /CapNhatRap` đổi `soLuongGhe` từ 20 → 25 thì `LayDanhSachPhongVe` cho lịch chiếu gán vào phòng
+này trả đủ 25 ghế (không test riêng ở đây, đã verify logic này khi build tính năng, xem mục 5.5).
+
+**DELETE `/XoaRap?MaRap=...`** → `200` (phòng test không có lịch chiếu nên xoá được).
+
+#### Lịch chiếu — `/api/QuanLyLichChieu`
+
+**GET `/LayDanhSachLichChieu?MaPhim=6a82cd53684ff0a3456d9d22`** — mảng lịch chiếu đã join sẵn tên
+phim/rạp/cụm rạp/hệ thống rạp, vd:
+```json
+{
+  "maLichChieu": "6a82cd53684ff0a3456d9e5e",
+  "maPhim": "6a82cd53684ff0a3456d9d22", "tenPhim": "Zero Hour",
+  "maRap": "6a82cd53684ff0a3456d98b9", "tenRap": "Phong 04",
+  "maCumRap": "6a82cd53684ff0a3456d98b5", "tenCumRap": "BHD Star Cineplex Diamond Plaza 07",
+  "maHeThongRap": "6a82cd52684ff0a3456d98ad", "tenHeThongRap": "BHD Star Cineplex",
+  "ngayChieuGioChieu": "2026-08-10T02:00:00.000Z", "giaVe": 80000
+}
+```
+
+**GET `/LayThongTinLichChieu?MaLichChieu=...`** → 1 object cùng cấu trúc trên.
+
+**POST `/ThemLichChieu`** (JSON: `{"maPhim":"...","maRap":"...","ngayChieuGioChieu":"2027-03-01T20:00","giaVe":85000}`)
+→ `201`, `ngayChieuGioChieu` lưu UTC đúng `-7h` so với giờ nhập (`13:00:00.000Z` cho input `20:00`,
+xem mục 6.4).
+
+**PUT `/CapNhatLichChieu`**, **DELETE `/XoaLichChieu?MaLichChieu=...`** → hoạt động đúng, đã test kèm
+mục 6.2's "chặn trùng phòng+giờ" ở phiên làm việc trước đó (mục 8 checklist — vẫn còn hiệu lực, xác
+nhận lại lần này: tạo trùng phòng+giờ → `409`, khác phòng cùng giờ → `201`).
+
+**GET `.../LayThongTinLichChieuPhim?MaPhim=...`** → cấu trúc lồng 3 cấp đúng như mục 6.2 đã mô tả,
+đã verify với phim thật có 12 suất chiếu trải nhiều ngày/phòng, mỗi suất có đủ `giaVeMin`/`giaVeMax`.
+
+#### Booking & Ghế — `/api/QuanLyDatVe`
+
+**GET `/LayDanhSachPhongVe?MaLichChieu=...`** (lịch chiếu test tạo riêng để không ảnh hưởng dữ liệu
+thật)
+```json
+{
+  "statusCode": 200,
+  "content": {
+    "thongTinPhim": {
+      "tenPhim": "Zero Hour", "tenCumRap": "Lotte Cinema Cantavil", "tenRap": "Phong 2",
+      "diaChi": "Tầng 7, Cantavil Premier, 1 Song Hành, An Phú, Quận 2 (TP. Thủ Đức), TP.HCM",
+      "ngayChieu": "10/04/2027", "gioChieu": "20:00"
+    },
+    "danhSachGhe": [
+      { "maGhe": "6a88722a49141a4f8b00f96d", "tenGhe": "A1", "loaiGhe": "Thuong", "daDat": false, "giaVe": 75000 }
+    ]
+  }
+}
+```
+
+**POST `/DatVe`** — request `{"maLichChieu":"...","danhSachGhe":["6a88722a...96d","6a88722a...976"]}`
+(mảng **`maGhe`**, không phải `tenGhe`) →
+```json
+{
+    "statusCode": 201,
+    "message": "Dat ve thanh cong",
+    "content": {
+        "maVe": "6a88f49de190c5fd41072044",
+        "tongTien": 150000,
+        "trangThai": "pending",
+        "danhSachGhe": [
+            { "maGhe": "6a88722a49141a4f8b00f96d", "giaVe": 75000 },
+            { "maGhe": "6a88722a49141a4f8b00f976", "giaVe": 75000 }
+        ]
+    }
+}
+```
+Gọi lại `POST /DatVe` với **đúng ghế vừa đặt** → `409 {"message":"Ghe da duoc dat, vui long chon ghe khac"}`
+— xác nhận cơ chế chống đặt trùng ghế hoạt động đúng.
+
+**GET `/LayLichSuDatVe`** (token của khách vừa đặt) → mảng có `danhSachGhe: [{maGhe, tenGhe, giaVe}]`
+(đã populate `tenGhe: "A1"` đúng như mục 5.8 mô tả) và `thongTinPhim` đầy đủ tên phim/rạp/cụm rạp/hệ
+thống rạp + `ngayChieuGioChieu` dạng ISO UTC.
+
+**PUT `/HuyVe?MaVe=...`** → `200`, `trangThai` đổi thành `"cancelled"`.
+
+**GET `/LayDanhSachVeDaBan`** (admin, không filter) → trả mảng vé thật (621-622 vé tại thời điểm
+test, tuỳ dữ liệu nhóm), mỗi phần tử có thêm `taiKhoan`/`hoTenKhachHang`/`emailKhachHang`.
+
+**GET `/ThongKeDoanhThu`** (admin, không filter) → `{"tongDoanhThu": 115180000, "soVe": 567}` (số
+thật tại thời điểm test, không tính vé đã huỷ).
+
+> ⚠️ **Bug thật phát hiện khi test `LayDanhSachVeDaBan?MaPhim=`:** filter theo `?MaPhim=` **luôn trả
+> mảng rỗng**, kể cả khi chắc chắn có vé của đúng phim đó (đã tái hiện: đặt vé cho phim X xong gọi
+> `LayDanhSachVeDaBan?MaPhim=<id phim X>` → trả `[]`). Nguyên nhân: `mapBookingHistory`
+> (`backend/utils/bookingMapper.js`) xây object `thongTinPhim` nhưng **không có field `maPhim`**
+> trong đó (chỉ có `tenPhim`, `hinhAnh`, `ngayChieuGioChieu`, `tenHeThongRap`, `tenCumRap`, `tenRap`)
+> — trong khi `bookingController.js` lại lọc theo đúng `booking.thongTinPhim.maPhim === MaPhim`, so
+> sánh với `undefined` nên luôn `false`. **Ảnh hưởng thực tế: không nghiêm trọng** — trang admin
+> `/admin/booking` (`BookingManager.jsx`) hiện chỉ lọc theo `?TuNgay=`/`?DenNgay=` (hoạt động đúng),
+> **không có ô lọc theo phim trên UI** nên người dùng thật chưa từng gặp lỗi này. Vẫn là 1 bug thật
+> trong API cần sửa nếu sau này có ai dùng trực tiếp filter này (Postman, tích hợp khác...). Chưa sửa
+> trong lần cập nhật note này (nằm ngoài phạm vi yêu cầu — chỉ update tài liệu), cần xác nhận với
+> Thịnh trước khi sửa code.
+
+### 11.2 Trạng thái deploy thật (xác nhận trực tiếp qua HTTP request, không suy đoán)
+
+**Backend — Render:**
+- ✅ **Đã deploy**, URL: `https://doan-ie213.onrender.com` (service `capstone-film-backend` theo
+  `render.yaml`, region `singapore`, plan free).
+- ✅ Endpoint gốc `GET /` trả `{"statusCode":200,"message":"Catalog backend is running"}`.
+- ✅ **`MONGO_URI` đã set đúng và hoạt động**: gọi thật `GET /api/QuanLyPhim/LayDanhSachPhim` trên
+  URL Render (không phải local) trả về 16 phim thật từ Atlas; `GET /api/QuanLyBanner/LayDanhSachBanner`
+  trả 7 banner thật.
+- ✅ **`JWT_SECRET` đã set và hoạt động đúng vòng đời token**: đăng ký tài khoản test thật qua
+  `POST https://doan-ie213.onrender.com/api/QuanLyNguoiDung/DangKy`, đăng nhập lấy `accessToken`, gọi
+  `GET ThongTinTaiKhoan` kèm token đó → `200`, xác thực đúng. *Lưu ý:* không thể xác minh **giá trị**
+  `JWT_SECRET` có phải secret thật khác `"dev-secret-key"` (fallback cứng trong code, xem mục 6.1) hay
+  không từ bên ngoài — cần Thịnh tự kiểm tra trực tiếp trong Render Dashboard → Environment để chắc
+  chắn `JWT_SECRET` đã được set tường minh (không rơi vào fallback).
+- ✅ **`CLOUDINARY_*` đã set đúng và hoạt động**: dùng tài khoản admin tạm, gọi thật
+  `POST https://doan-ie213.onrender.com/api/QuanLyBanner/ThemBanner` với 1 ảnh test → nhận về URL
+  Cloudinary thật (`https://res.cloudinary.com/ilmsqrsb/...`), sau đó đã xoá banner test này ngay.
+- Tài khoản test đã tạo trên Render (`__render_test_...`) đã bị xoá khỏi DB sau khi test xong.
+
+**Frontend — Vercel:**
+- ✅ **Đã deploy**, URL: `https://do-an-ie-213.vercel.app`.
+- ✅ Đã xác nhận qua Playwright thật (không chỉ mở tay): trang tải thành công, `<title>` là
+  "CyberFilm" (đúng branding mới nhất), render được 32 thẻ phim, **không có lỗi console**, và toàn bộ
+  request `/api/...` của trang đều gọi đúng về `https://doan-ie213.onrender.com` — xác nhận biến môi
+  trường build-time (`VITE_API_URL`) trên Vercel đã trỏ đúng backend production, không phải
+  `localhost`.
+
+**Kết luận mục 11.2:** cả Backend và Frontend **đều đã deploy thành công và hoạt động đúng** tại thời
+điểm kiểm thử (2026-08-22). Việc duy nhất không tự xác minh được từ bên ngoài là giá trị cụ thể của
+`JWT_SECRET` — cần Thịnh xác nhận thủ công trong Render Dashboard.
+
+### 11.3 Kết quả chạy thật checklist end-to-end (mục 9) — không phải liệt kê kế hoạch, là kết quả thật
+
+Chạy bằng Playwright thật trên `localhost` (dev server) ngay sau khi build lại toàn bộ tính năng mới
+nhất, dùng tài khoản test tự tạo rồi xoá sạch sau khi xong. **Toàn bộ 13 bước dưới đây đều PASS**,
+không có console error nào trong suốt quá trình chạy:
+
+| # | Bước | Kết quả | Ghi chú thật |
+|---|---|---|---|
+| 1 | `DangKy` → `DangNhap` | ✅ PASS | Đăng ký + đăng nhập tài khoản test mới, nhận `accessToken`, redirect về trang chủ đúng |
+| 2 | Trang chủ: 2 dropdown lọc thể loại/trạng thái | ✅ PASS | 16 phim → còn 10 phim khi lọc "Hot" |
+| 3 | Trang Detail: metadata + trailer + lịch chiếu | ✅ PASS | Nút "Xem trailer" tồn tại, đầy đủ thông tin phim |
+| 4 | Booking: chọn ghế + đặt vé | ✅ PASS | Đặt vé thành công, redirect về trang chủ, dialog xác nhận đúng |
+| 4b | Chống đặt trùng ghế (test riêng, phiên trước) | ✅ PASS | Đặt lại đúng ghế vừa đặt → `409`, ghế hiện `disabled` + màu xám trên UI, không bấm chọn lại được |
+| 5a | Profile: hiển thị tên ghế trong lịch sử | ✅ PASS | Hiện đúng `Ghế: A1, A10` (tên ghế thật, không phải số lượng) |
+| 5b | Profile: cập nhật thông tin cá nhân | ✅ PASS | Sửa họ tên → lưu thành công → Navbar cập nhật tên mới ngay, không cần tải lại trang |
+| 5c | Profile: huỷ vé | ✅ PASS | Bấm huỷ, xác nhận dialog, trạng thái đổi đúng |
+| 6 | `/admin/film` danh sách phim | ✅ PASS | 16 dòng hiển thị đúng |
+| 7 | `/admin/user` danh sách người dùng | ✅ PASS | 43 dòng hiển thị đúng |
+| 8 | `/admin/cinema` quản lý hệ thống/cụm/phòng | ✅ PASS | Đủ 3 khu vực quản lý (Hệ thống rạp/Cụm rạp/Phòng chiếu) |
+| 9a | `/admin/showtime` danh sách lịch chiếu | ✅ PASS | 744 dòng hiển thị đúng |
+| 9b | Sửa lịch chiếu: giờ VN đồng bộ list ↔ form sửa | ✅ PASS | List hiện `10/08/2026 09:00`, mở form sửa ra đúng `2026-08-10T09:00` — không lệch giờ |
+| 10 | `/admin/booking` danh sách vé + doanh thu | ✅ PASS | 622 dòng vé + khối thống kê doanh thu hiển thị đúng |
+| 11 | `/admin/banner` danh sách banner | ✅ PASS | 9 ảnh banner hiển thị đúng |
+
+**Không có bước nào FAIL trong checklist UI.** Bug duy nhất phát hiện được trong lần kiểm thử này nằm
+ở tầng API thuần (mục 11.1, `LayDanhSachVeDaBan?MaPhim=`), không lộ ra qua giao diện vì FE không dùng
+filter này.
+
+### 11.4 Xác nhận trạng thái Postman collection thật
+
+Đã kiểm tra trực tiếp:
+- `find . -iname "*postman*"` trên toàn bộ repo (cả backend lẫn frontend) → **không tìm thấy file
+  nào** (không có `.postman_collection.json` hay thư mục `postman/` nào được commit).
+- `git log --all` toàn repo → không có commit nào nhắc tới "Postman" hay "Nhật Minh"/"Tăng Nhật Minh".
+- File `.docx` duy nhất hiện có trong repo (`DanY_Chuong3_Chuong4.docx`, chưa được commit vào git) chỉ
+  là **dàn ý hướng dẫn viết chương 3-4 của báo cáo** — có nhắc tới việc dùng Postman để kiểm thử thủ
+  công (mục 4.3 trong dàn ý), nhưng **không chứa bảng phân công công việc** và **không nhắc tên "Tăng
+  Nhật Minh"** ở đâu cả. Đây không phải là file `PhanCongCongViec_BE_DB.docx` được nhắc tới ở mục 1 —
+  file đó không có trong repo này, có thể Thịnh đang giữ riêng.
+
+**Kết luận:** dựa trên toàn bộ những gì có trong repo, **không có bằng chứng nào cho thấy đã tồn tại
+1 bộ Postman collection hoàn chỉnh cho toàn hệ thống** — khớp với mục 10 của note này (đã liệt kê
+"Postman collection hoàn chỉnh" vào nhóm **chưa làm**). Nếu bảng phân công công việc trong báo cáo
+đang ghi mục này là "100% hoàn thành (Tăng Nhật Minh)", **cần trao đổi trực tiếp với bạn Tăng Nhật
+Minh và Thịnh** để xác nhận: (a) file Postman collection có tồn tại ở đâu đó ngoài repo này không
+(máy cá nhân, Postman Cloud workspace riêng...), và nếu có thì xin file/link để đưa vào repo trước
+khi nộp báo cáo; (b) nếu thực sự chưa làm, cần cập nhật lại bảng phân công cho đúng thực tế trước khi
+nộp, tránh báo cáo sai sự thật với giảng viên.
